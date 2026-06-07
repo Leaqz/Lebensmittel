@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font is loaded via <link> in index.html */
+* { font-family: 'Inter', system-ui, sans-serif; }
+
+@keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideUp   { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn    { from{opacity:0} to{opacity:1} }
+@keyframes spin      { to{transform:rotate(360deg)} }
+@keyframes salePop   { 0%{transform:scale(.7);opacity:0} 60%{transform:scale(1.15)} 100%{transform:scale(1);opacity:1} }
+@keyframes saleGlow  { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)} 50%{box-shadow:0 0 0 5px rgba(239,68,68,0)} }
+@keyframes shimmer   { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+@keyframes pop       { 0%{transform:scale(.85);opacity:0} 60%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+@keyframes pulse-loc { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+.anim-slideDown { animation:slideDown .2s ease-out both }
+.anim-slideUp   { animation:slideUp .25s ease-out both }
+.anim-fadeIn    { animation:fadeIn .3s ease-out both }
+.anim-spin      { animation:spin 1s linear infinite }
+.anim-pop       { animation:pop .3s cubic-bezier(.34,1.56,.64,1) both }
+.anim-pulse-loc { animation:pulse-loc 1.5s ease-in-out infinite }
+.sale-badge     { animation:salePop .35s cubic-bezier(.34,1.56,.64,1) both }
+.sale-glow      { animation:saleGlow 2s ease-in-out infinite }
+.sale-row       { background:linear-gradient(90deg,#fff7ed 0%,#fff 60%) }
+.shimmer-bg     { background:linear-gradient(90deg,#f0fdf4 25%,#d1fae5 50%,#f0fdf4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite }
+
+input[type=range]                        { -webkit-appearance:none;appearance:none;height:6px;border-radius:99px;outline:none;cursor:pointer }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#10b981;cursor:pointer;box-shadow:0 0 0 3px #d1fae5,0 2px 6px rgba(16,185,129,.35) }
+input[type=range]::-moz-range-thumb     { width:20px;height:20px;border-radius:50%;background:#10b981;cursor:pointer;border:none;box-shadow:0 0 0 3px #d1fae5 }
+
+::-webkit-scrollbar       { width:5px;height:5px }
+::-webkit-scrollbar-track { background:transparent }
+::-webkit-scrollbar-thumb { background:#a7f3d0;border-radius:99px }
+
+body { background:#f0fdf4;margin:0 }
+
+.card { background:#fff;border-radius:20px;border:1px solid #d1fae5;box-shadow:0 1px 4px rgba(0,0,0,.04) }
+.btn-primary { background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:12px;font-weight:700;transition:all .18s;box-shadow:0 2px 8px rgba(16,185,129,.3) }
+.btn-primary:hover:not(:disabled) { transform:scale(1.02);box-shadow:0 4px 14px rgba(16,185,129,.4) }
+.btn-primary:active:not(:disabled) { transform:scale(.97) }
+.btn-ghost { background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:12px;font-weight:600;transition:all .18s }
+.btn-ghost:hover { background:rgba(255,255,255,.22) }
+del { color:#9ca3af;text-decoration-color:#9ca3af }
+
+.aldi-logo    { background:linear-gradient(135deg,#003087,#0050b3) }
+.lidl-logo    { background:linear-gradient(135deg,#c00000,#e8000d) }
+.rewe-logo    { background:linear-gradient(135deg,#cc0000,#e60000) }
+.edeka-logo   { background:linear-gradient(135deg,#e3051a,#f50000) }
+.penny-logo   { background:linear-gradient(135deg,#c00000,#e00000) }
+.netto-logo   { background:linear-gradient(135deg,#e5a800,#ffbc00) }
+.kaufland-logo{ background:linear-gradient(135deg,#cc0000,#e03030) }
+.unknown-logo { background:linear-gradient(135deg,#6b7280,#9ca3af) }
