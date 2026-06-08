@@ -24,13 +24,13 @@ const TABS = [
 
 function EmptyHero({ mode }) {
   return (
-    <div className="card p-12 flex flex-col items-center text-center" style={{ border: '1.5px dashed rgba(48,209,88,0.3)' }}>
+    <div className="card p-12 flex flex-col items-center text-center" style={{ border: '1.5px dashed rgba(48,209,88,0.25)' }}>
       <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-5"
-        style={{ background: 'linear-gradient(145deg,rgba(48,209,88,0.15),rgba(48,209,88,0.08))' }}>
+        style={{ background: 'linear-gradient(145deg,rgba(48,209,88,0.15),rgba(48,209,88,0.06))' }}>
         <I.Cart size={26} color="#30D158" />
       </div>
-      <h3 className="font-[800] text-[#1D1D1F] text-[17px] mb-2 tracking-[-0.02em]">Deine Liste ist leer</h3>
-      <p className="text-[14px] text-[#6E6E73] max-w-xs leading-relaxed">
+      <h3 className="font-[800] text-[17px] mb-2 tracking-[-0.02em]" style={{ color: '#F5F5F7' }}>Deine Liste ist leer</h3>
+      <p className="text-[14px] max-w-xs leading-relaxed" style={{ color: 'rgba(235,235,245,0.6)' }}>
         {mode === 'manual'
           ? 'Suche links nach Produkten und vergleiche die Preise bei Aldi, Lidl, REWE und EDEKA sofort.'
           : 'Nutze den KI-Planer links: Budget, Personenzahl und Ernährungsweise eingeben — fertig.'}
@@ -90,36 +90,31 @@ function CrawlerPanel() {
     }
   };
 
-  const statusColor = (s) => ({
-    success: 'text-emerald-600 bg-emerald-50', failed: 'text-red-600 bg-red-50',
-    running: 'text-blue-600 bg-blue-50', skipped: 'text-gray-500 bg-gray-50',
-  }[s] || 'text-gray-400');
-
   const statusPill = (s) => ({
-    success: { bg: 'rgba(48,209,88,0.1)',  color: '#1A7A32', label: 'success'  },
-    failed:  { bg: 'rgba(255,59,48,0.1)',  color: '#C41E12', label: 'failed'   },
-    running: { bg: 'rgba(0,122,255,0.1)',  color: '#0055C7', label: 'running'  },
-    skipped: { bg: 'rgba(0,0,0,0.06)',     color: '#6E6E73', label: 'skipped'  },
-  }[s] || { bg: 'rgba(0,0,0,0.05)', color: '#AEAEB2', label: s });
+    success: { bg: 'rgba(48,209,88,0.12)',  color: '#30D158',              label: 'success'  },
+    failed:  { bg: 'rgba(255,69,58,0.12)',  color: '#FF453A',              label: 'failed'   },
+    running: { bg: 'rgba(10,132,255,0.12)', color: '#0A84FF',              label: 'running'  },
+    skipped: { bg: 'rgba(255,255,255,0.08)',color: 'rgba(235,235,245,0.6)',label: 'skipped'  },
+  }[s] || { bg: 'rgba(255,255,255,0.06)', color: 'rgba(235,235,245,0.3)', label: s });
 
   return (
     <div className="space-y-4">
       {toast && (
         <div className="anim-slideDown text-[13px] font-[600] px-4 py-3 rounded-[14px]"
-          style={{ background:'#1D1D1F', color:'#fff', boxShadow:'0 8px 32px rgba(0,0,0,0.3)' }}>
+          style={{ background:'#2C2C2E', color:'#F5F5F7', boxShadow:'0 8px 32px rgba(0,0,0,0.6)' }}>
           {toast}
         </div>
       )}
 
       {loading ? (
-        <div className="card p-10 text-center text-[13px]" style={{ color:'#AEAEB2' }}>
+        <div className="card p-10 text-center text-[13px]" style={{ color:'rgba(235,235,245,0.3)' }}>
           Verbinde mit Backend…
         </div>
       ) : (
         <>
           <div className="card overflow-hidden">
-            <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom:'0.5px solid rgba(0,0,0,0.06)' }}>
-              <span className="text-[14px] font-[700]" style={{ color:'#1D1D1F' }}>Crawler-Konfiguration</span>
+            <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom:'0.5px solid rgba(255,255,255,0.08)' }}>
+              <span className="text-[14px] font-[700]" style={{ color:'#F5F5F7' }}>Crawler-Konfiguration</span>
               <button
                 onClick={handleRun}
                 disabled={running}
@@ -127,32 +122,32 @@ function CrawlerPanel() {
                   running ? 'cursor-not-allowed' : ''
                 }`}
                 style={running
-                  ? { background:'#F2F2F7', color:'#AEAEB2' }
-                  : { background:'#007AFF', color:'#fff', boxShadow:'0 2px 12px rgba(0,122,255,0.35)' }
+                  ? { background:'#2C2C2E', color:'rgba(235,235,245,0.3)' }
+                  : { background:'#0A84FF', color:'#fff', boxShadow:'0 2px 12px rgba(10,132,255,0.4)' }
                 }
               >
-                {running ? <><I.Spinner size={12} color="#AEAEB2" /> Läuft…</> : <><I.Zap size={12} /> Crawl starten</>}
+                {running ? <><I.Spinner size={12} color="rgba(235,235,245,0.3)" /> Läuft…</> : <><I.Zap size={12} /> Crawl starten</>}
               </button>
             </div>
             <div>
               {configs.length === 0 && (
-                <div className="p-6 text-center text-[13px]" style={{ color:'#AEAEB2' }}>
+                <div className="p-6 text-center text-[13px]" style={{ color:'rgba(235,235,245,0.3)' }}>
                   Keine Konfigurationen — Backend starten &amp; DB initialisieren.
                 </div>
               )}
               {configs.map((cfg, i) => (
                 <div key={cfg.id} className="px-5 py-3.5 flex items-center gap-4"
-                  style={i < configs.length - 1 ? { borderBottom:'0.5px solid rgba(0,0,0,0.05)' } : {}}>
+                  style={i < configs.length - 1 ? { borderBottom:'0.5px solid rgba(255,255,255,0.06)' } : {}}>
                   <div className="flex-1">
-                    <div className="text-[14px] font-[600]" style={{ color:'#1D1D1F' }}>{cfg.supermarket_name}</div>
-                    <div className="text-[12px] mt-0.5" style={{ color:'#AEAEB2' }}>Max {cfg.max_items} Produkte · {cfg.delay_ms} ms Pause</div>
+                    <div className="text-[14px] font-[600]" style={{ color:'#F5F5F7' }}>{cfg.supermarket_name}</div>
+                    <div className="text-[12px] mt-0.5" style={{ color:'rgba(235,235,245,0.3)' }}>Max {cfg.max_items} Produkte · {cfg.delay_ms} ms Pause</div>
                   </div>
-                  <label className="flex items-center gap-1.5 text-[12px] font-[600] cursor-pointer" style={{ color:'#6E6E73' }}>
+                  <label className="flex items-center gap-1.5 text-[12px] font-[600] cursor-pointer" style={{ color:'rgba(235,235,245,0.6)' }}>
                     <input type="checkbox" checked={cfg.is_enabled}
                       onChange={(e) => handleToggle(cfg, 'is_enabled', e.target.checked)} className="rounded" />
                     Aktiv
                   </label>
-                  <label className="flex items-center gap-1.5 text-[12px] font-[600] cursor-pointer" style={{ color:'#6E6E73' }}
+                  <label className="flex items-center gap-1.5 text-[12px] font-[600] cursor-pointer" style={{ color:'rgba(235,235,245,0.6)' }}
                     title="Nur einmal crawlen, danach überspringen.">
                     <input type="checkbox" checked={cfg.run_once}
                       onChange={(e) => handleToggle(cfg, 'run_once', e.target.checked)} className="rounded" />
@@ -165,20 +160,20 @@ function CrawlerPanel() {
 
           {history.length > 0 && (
             <div className="card overflow-hidden">
-              <div className="px-5 py-4" style={{ borderBottom:'0.5px solid rgba(0,0,0,0.06)' }}>
-                <span className="text-[14px] font-[700]" style={{ color:'#1D1D1F' }}>Verlauf (letzte 20)</span>
+              <div className="px-5 py-4" style={{ borderBottom:'0.5px solid rgba(255,255,255,0.08)' }}>
+                <span className="text-[14px] font-[700]" style={{ color:'#F5F5F7' }}>Verlauf (letzte 20)</span>
               </div>
               <div className="max-h-72 overflow-y-auto">
                 {history.map((h, i) => {
                   const pill = statusPill(h.status);
                   return (
                     <div key={h.id} className="px-5 py-2.5 flex items-center gap-3 text-[12px]"
-                      style={i < history.length - 1 ? { borderBottom:'0.5px solid rgba(0,0,0,0.04)' } : {}}>
+                      style={i < history.length - 1 ? { borderBottom:'0.5px solid rgba(255,255,255,0.05)' } : {}}>
                       <span className="font-[700] px-2 py-0.5 rounded-[6px]"
                         style={{ background: pill.bg, color: pill.color }}>{h.status}</span>
-                      <span className="font-[600]" style={{ color:'#1D1D1F' }}>{h.supermarket}</span>
-                      <span style={{ color:'#6E6E73' }}>{h.items_crawled} Produkte</span>
-                      <span className="ml-auto" style={{ color:'#AEAEB2' }}>
+                      <span className="font-[600]" style={{ color:'#F5F5F7' }}>{h.supermarket}</span>
+                      <span style={{ color:'rgba(235,235,245,0.6)' }}>{h.items_crawled} Produkte</span>
+                      <span className="ml-auto" style={{ color:'rgba(235,235,245,0.3)' }}>
                         {new Date(h.started_at).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}
                       </span>
                     </div>
@@ -189,9 +184,9 @@ function CrawlerPanel() {
           )}
 
           <div className="card p-4 text-[12px] leading-relaxed"
-            style={{ background:'rgba(0,122,255,0.05)', boxShadow:'none', border:'0.5px solid rgba(0,122,255,0.15)' }}>
-            <div className="font-[700] mb-1" style={{ color:'#007AFF' }}>Wie funktioniert „Nur einmal"?</div>
-            <p style={{ color:'#6E6E73' }}>
+            style={{ background:'rgba(10,132,255,0.07)', boxShadow:'none', border:'0.5px solid rgba(10,132,255,0.2)' }}>
+            <div className="font-[700] mb-1" style={{ color:'#0A84FF' }}>Wie funktioniert „Nur einmal"?</div>
+            <p style={{ color:'rgba(235,235,245,0.6)' }}>
               Wenn <strong>Nur einmal</strong> aktiviert ist, crawlt der Crawler diesen Markt nur beim ersten Durchlauf.
               Deaktiviere es, damit bei jedem Aufruf neu gecrawlt wird.
             </p>
@@ -355,12 +350,12 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background:'#F5F5F7' }}>
+    <div className="min-h-screen" style={{ background:'#000000' }}>
 
       {/* Toast */}
       {toast && (
         <div className="fixed top-5 right-5 z-50 anim-slideDown text-[13px] font-[600] px-4 py-3 rounded-[14px] max-w-xs"
-          style={{ background:'#1D1D1F', color:'#fff', boxShadow:'0 8px 32px rgba(0,0,0,0.28)' }}>
+          style={{ background:'#2C2C2E', color:'#F5F5F7', boxShadow:'0 8px 32px rgba(0,0,0,0.7), 0 0 0 0.5px rgba(255,255,255,0.08)' }}>
           {toast}
         </div>
       )}
@@ -376,10 +371,10 @@ export default function App() {
 
       {/* ── Header ── */}
       <header className="sticky top-0 z-40" style={{
-        background: 'rgba(245,245,247,0.82)',
+        background: 'rgba(0,0,0,0.8)',
         backdropFilter: 'blur(24px) saturate(180%)',
         WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-        borderBottom: '0.5px solid rgba(0,0,0,0.08)',
+        borderBottom: '0.5px solid rgba(255,255,255,0.08)',
       }}>
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-[60px] flex items-center gap-4">
 
@@ -389,7 +384,7 @@ export default function App() {
               style={{ background:'linear-gradient(145deg,#30D158,#1A9940)', boxShadow:'0 2px 8px rgba(48,209,88,0.4)' }}>
               <I.Cart size={17} color="white" />
             </div>
-            <span className="font-[800] text-[16px] tracking-[-0.025em]" style={{ color:'#1D1D1F' }}>
+            <span className="font-[800] text-[16px] tracking-[-0.025em]" style={{ color:'#F5F5F7' }}>
               GroceryGenius
             </span>
           </div>
@@ -414,7 +409,7 @@ export default function App() {
                 n + allStores.filter((s) => s.distance <= radius && item.sales?.[s.catalogId || s.id]).length, 0);
               return totalDeals > 0 ? (
                 <div className="sale-glow flex items-center gap-1.5 px-3 py-1.5 rounded-[980px] text-[12px] font-[700]"
-                  style={{ background:'rgba(255,59,48,0.08)', color:'#FF3B30' }}>
+                  style={{ background:'rgba(255,69,58,0.1)', color:'#FF453A' }}>
                   <I.Percent size={11} /> {totalDeals} Angebot{totalDeals > 1 ? 'e' : ''}
                 </div>
               ) : null;
@@ -422,7 +417,7 @@ export default function App() {
             {list.length > 0 && (
               <button onClick={() => setActiveTab('shop')}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-[980px] text-[12px] font-[700] transition-all hover:opacity-80"
-                style={{ background:'rgba(48,209,88,0.1)', color:'#30D158' }}>
+                style={{ background:'rgba(48,209,88,0.12)', color:'#30D158' }}>
                 <I.Cart size={12} /> {list.length}
               </button>
             )}
@@ -430,11 +425,11 @@ export default function App() {
         </div>
 
         {/* Mobile bottom tab bar */}
-        <div className="sm:hidden flex" style={{ borderTop:'0.5px solid rgba(0,0,0,0.06)' }}>
+        <div className="sm:hidden flex" style={{ borderTop:'0.5px solid rgba(255,255,255,0.08)' }}>
           {TABS.map((tab) => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-[600] transition-colors"
-              style={{ color: activeTab === tab.id ? '#30D158' : '#AEAEB2' }}>
+              style={{ color: activeTab === tab.id ? '#30D158' : 'rgba(235,235,245,0.3)' }}>
               <span className="text-[18px] leading-none">{tab.icon}</span>
               <span>{tab.label}</span>
             </button>
@@ -500,8 +495,8 @@ export default function App() {
         {activeTab === 'meals' && (
           <div>
             <div className="mb-6">
-              <h2 className="font-[800] text-[26px] tracking-[-0.03em]" style={{ color:'#1D1D1F' }}>Mahlzeiten planen</h2>
-              <p className="text-[14px] mt-1.5" style={{ color:'#6E6E73' }}>
+              <h2 className="font-[800] text-[26px] tracking-[-0.03em]" style={{ color:'#F5F5F7' }}>Mahlzeiten planen</h2>
+              <p className="text-[14px] mt-1.5" style={{ color:'rgba(235,235,245,0.6)' }}>
                 Wähle eine Mahlzeit, stelle die Portionen ein und füge die Zutaten direkt zur Einkaufsliste hinzu.
               </p>
             </div>
@@ -512,8 +507,8 @@ export default function App() {
         {activeTab === 'crawler' && (
           <div>
             <div className="mb-6">
-              <h2 className="font-[800] text-[26px] tracking-[-0.03em]" style={{ color:'#1D1D1F' }}>Crawler-Verwaltung</h2>
-              <p className="text-[14px] mt-1.5" style={{ color:'#6E6E73' }}>
+              <h2 className="font-[800] text-[26px] tracking-[-0.03em]" style={{ color:'#F5F5F7' }}>Crawler-Verwaltung</h2>
+              <p className="text-[14px] mt-1.5" style={{ color:'rgba(235,235,245,0.6)' }}>
                 Verwalte die Daten-Crawler für deutsche Supermärkte. Benötigt das laufende Backend (Docker).
               </p>
             </div>

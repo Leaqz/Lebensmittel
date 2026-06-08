@@ -2,30 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Manrope variable font loaded via <link> in index.html */
+/* System font prioritises SF Pro on Apple; Manrope as fallback */
 * {
-  font-family: 'Manrope', system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Manrope', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* ── CSS custom properties ─────────────────────────────────────── */
 :root {
-  --bg:        #F5F5F7;
-  --card:      #FFFFFF;
-  --fill:      #F2F2F7;
-  --fill2:     #E5E5EA;
-  --fill3:     #D1D1D6;
-  --l1:        #1D1D1F;
-  --l2:        #6E6E73;
-  --l3:        #AEAEB2;
-  --sep:       rgba(0,0,0,0.06);
+  --bg:        #000000;
+  --card:      #1C1C1E;
+  --fill:      #2C2C2E;
+  --fill2:     #3A3A3C;
+  --fill3:     #48484A;
+  --l1:        #F5F5F7;
+  --l2:        rgba(235,235,245,0.6);
+  --l3:        rgba(235,235,245,0.3);
+  --sep:       rgba(255,255,255,0.08);
   --green:     #30D158;
-  --red:       #FF3B30;
-  --blue:      #007AFF;
-  --orange:    #FF9500;
+  --red:       #FF453A;
+  --blue:      #0A84FF;
+  --orange:    #FF9F0A;
   --yellow:    #FFD60A;
-  --card-shadow: 0 0 0 0.5px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.07);
+  --card-shadow: 0 0 0 0.5px rgba(255,255,255,0.06), 0 4px 24px rgba(0,0,0,0.6);
 }
 
 /* ── Animations ─────────────────────────────────────────────────── */
@@ -34,7 +34,7 @@
 @keyframes fadeIn    { from { opacity:0 }                              to { opacity:1 } }
 @keyframes spin      { to   { transform:rotate(360deg) } }
 @keyframes salePop   { 0%{transform:scale(.65);opacity:0} 65%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
-@keyframes saleGlow  { 0%,100%{box-shadow:0 0 0 0 rgba(255,59,48,.35)} 50%{box-shadow:0 0 0 6px rgba(255,59,48,0)} }
+@keyframes saleGlow  { 0%,100%{box-shadow:0 0 0 0 rgba(255,69,58,.35)} 50%{box-shadow:0 0 0 6px rgba(255,69,58,0)} }
 @keyframes shimmer   { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
 @keyframes pop       { 0%{transform:scale(.82);opacity:0} 65%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
 @keyframes pulse-loc { 0%,100%{opacity:1} 50%{opacity:.45} }
@@ -49,7 +49,7 @@
 .anim-fadeSlide { animation: fadeSlide .3s ease-out both }
 .sale-badge     { animation: salePop .28s cubic-bezier(.34,1.56,.64,1) both }
 .sale-glow      { animation: saleGlow 2.4s ease-in-out infinite }
-.sale-row       { background: linear-gradient(90deg, rgba(255,59,48,.04) 0%, #fff 75%) }
+.sale-row       { background: linear-gradient(90deg, rgba(255,69,58,.10) 0%, transparent 75%) }
 
 /* ── Range input — Apple iOS style ─────────────────────────────── */
 input[type=range] {
@@ -67,7 +67,7 @@ input[type=range]::-webkit-slider-thumb {
   border-radius: 50%;
   background: #fff;
   cursor: pointer;
-  box-shadow: 0 0 0 0.5px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.2), 0 0 0 1.5px var(--green);
+  box-shadow: 0 0 0 0.5px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.6), 0 0 0 1.5px var(--green);
   transition: transform .15s cubic-bezier(.34,1.56,.64,1);
 }
 input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15) }
@@ -78,13 +78,13 @@ input[type=range]::-moz-range-thumb {
   background: #fff;
   cursor: pointer;
   border: none;
-  box-shadow: 0 0 0 0.5px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 0 0 0.5px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.6);
 }
 
 /* ── Scrollbar ──────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 4px; height: 4px }
 ::-webkit-scrollbar-track { background: transparent }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.10); border-radius: 99px }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px }
 
 /* ── Base ───────────────────────────────────────────────────────── */
 body { background: var(--bg); margin: 0 }
@@ -104,7 +104,7 @@ body { background: var(--bg); margin: 0 }
   font-weight: 700;
   transition: all .16s cubic-bezier(.4,0,.2,1);
 }
-.btn-primary:hover:not(:disabled) { background: #0071F0; transform: scale(1.02) }
+.btn-primary:hover:not(:disabled) { background: #0078F0; transform: scale(1.02) }
 .btn-primary:active:not(:disabled) { transform: scale(.97) }
 
 .btn-green {
@@ -118,14 +118,14 @@ body { background: var(--bg); margin: 0 }
 .btn-green:active:not(:disabled) { transform: scale(.97) }
 
 .btn-ghost {
-  background: rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.08);
   border: none;
   color: var(--l1);
   border-radius: 980px;
   font-weight: 600;
   transition: all .16s;
 }
-.btn-ghost:hover { background: rgba(0,0,0,0.10) }
+.btn-ghost:hover { background: rgba(255,255,255,0.12) }
 
 del { color: var(--l3); text-decoration-color: var(--l3) }
 
@@ -172,7 +172,7 @@ del { color: var(--l3); text-decoration-color: var(--l3) }
 }
 .seg-tab:hover { color: var(--l1) }
 .seg-tab.active {
-  background: var(--card);
+  background: rgba(255,255,255,0.1);
   color: var(--l1);
-  box-shadow: 0 1px 5px rgba(0,0,0,0.12), 0 0 0 0.5px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 5px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(255,255,255,0.06);
 }

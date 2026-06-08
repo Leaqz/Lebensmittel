@@ -80,7 +80,7 @@ export default function MealPlanner({ visibleStores, addItem }) {
       <div className="card p-4 mb-5">
         <div className="relative mb-3">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-            <I.Search size={15} color="#AEAEB2" />
+            <I.Search size={15} color="rgba(235,235,245,0.3)" />
           </div>
           <input
             type="text"
@@ -89,18 +89,18 @@ export default function MealPlanner({ visibleStores, addItem }) {
             placeholder="Mahlzeit suchen…"
             className="w-full pl-9 pr-4 py-2.5 rounded-[12px] outline-none transition-all text-[14px] font-[500]"
             style={{
-              background: '#F2F2F7',
-              border: '1px solid rgba(0,0,0,0.08)',
-              color: '#1D1D1F',
+              background: '#2C2C2E',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: '#F5F5F7',
             }}
             onFocus={(e) => {
-              e.target.style.background = '#fff';
+              e.target.style.background = '#3A3A3C';
               e.target.style.border = '1.5px solid #30D158';
-              e.target.style.boxShadow = '0 0 0 3px rgba(48,209,88,0.10)';
+              e.target.style.boxShadow = '0 0 0 3px rgba(48,209,88,0.12)';
             }}
             onBlur={(e) => {
-              e.target.style.background = '#F2F2F7';
-              e.target.style.border = '1px solid rgba(0,0,0,0.08)';
+              e.target.style.background = '#2C2C2E';
+              e.target.style.border = '1px solid rgba(255,255,255,0.1)';
               e.target.style.boxShadow = 'none';
             }}
           />
@@ -113,8 +113,8 @@ export default function MealPlanner({ visibleStores, addItem }) {
               onClick={() => setActiveTag(tag)}
               className="px-3 py-1.5 rounded-[980px] text-[12px] font-[700] transition-all"
               style={activeTag === tag
-                ? { background: '#30D158', color: '#fff', boxShadow: '0 2px 10px rgba(48,209,88,0.35)' }
-                : { background: '#F2F2F7', color: '#6E6E73' }
+                ? { background: '#30D158', color: '#000', boxShadow: '0 2px 10px rgba(48,209,88,0.35)' }
+                : { background: '#2C2C2E', color: 'rgba(235,235,245,0.6)' }
               }
             >
               {tag}
@@ -125,8 +125,8 @@ export default function MealPlanner({ visibleStores, addItem }) {
 
       {!apiAvailable && (
         <div className="flex items-center gap-2 rounded-[12px] px-3 py-2.5 mb-4 text-[12px] font-[600]"
-          style={{ background: 'rgba(255,149,0,0.08)', border: '0.5px solid rgba(255,149,0,0.2)', color: '#B36200' }}>
-          <I.Info size={13} color="#FF9500" />
+          style={{ background: 'rgba(255,159,10,0.1)', border: '0.5px solid rgba(255,159,10,0.25)', color: '#FF9F0A' }}>
+          <I.Info size={13} color="#FF9F0A" />
           Backend nicht verbunden — statische Rezeptdaten werden verwendet.
         </div>
       )}
@@ -138,7 +138,7 @@ export default function MealPlanner({ visibleStores, addItem }) {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="card p-12 text-center text-[14px] font-[600]" style={{ color: '#AEAEB2' }}>
+        <div className="card p-12 text-center text-[14px] font-[600]" style={{ color: 'rgba(235,235,245,0.3)' }}>
           Keine Mahlzeiten gefunden 🤔
         </div>
       ) : (
@@ -161,31 +161,31 @@ export default function MealPlanner({ visibleStores, addItem }) {
 
       {selectedMeal && (
         <div className="card p-4 mt-4 flex items-center gap-4">
-          <span className="text-[14px] font-[700] shrink-0" style={{ color: '#6E6E73' }}>Portionen:</span>
+          <span className="text-[14px] font-[700] shrink-0" style={{ color: 'rgba(235,235,245,0.6)' }}>Portionen:</span>
           <div className="flex items-center rounded-[12px] overflow-hidden"
-            style={{ background: '#F2F2F7', border: '0.5px solid rgba(0,0,0,0.08)' }}>
+            style={{ background: '#2C2C2E', border: '0.5px solid rgba(255,255,255,0.1)' }}>
             <button
               onClick={() => setServings((s) => Math.max(1, s - 1))}
               className="w-9 h-9 flex items-center justify-center font-[700] text-lg transition-colors"
-              style={{ color: '#6E6E73' }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.06)'}
+              style={{ color: 'rgba(235,235,245,0.6)' }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
               onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             >−</button>
-            <span className="w-10 text-center font-[800] text-[14px]" style={{ color: '#1D1D1F' }}>{servings}</span>
+            <span className="w-10 text-center font-[800] text-[14px]" style={{ color: '#F5F5F7' }}>{servings}</span>
             <button
               onClick={() => setServings((s) => Math.min(20, s + 1))}
               className="w-9 h-9 flex items-center justify-center font-[700] text-lg transition-colors"
-              style={{ color: '#6E6E73' }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.06)'}
+              style={{ color: 'rgba(235,235,245,0.6)' }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
               onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             >+</button>
           </div>
           <button
             onClick={() => setSelectedMeal(null)}
             className="ml-auto text-[12px] font-[600] transition-colors"
-            style={{ color: '#AEAEB2' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#6E6E73'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#AEAEB2'}
+            style={{ color: 'rgba(235,235,245,0.3)' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'rgba(235,235,245,0.6)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(235,235,245,0.3)'}
           >
             Auswahl aufheben ✕
           </button>

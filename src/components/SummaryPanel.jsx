@@ -10,15 +10,15 @@ export default function SummaryPanel({ bestStore, savings, avgTotal, list, expor
   return (
     <div className="rounded-[22px] p-6 relative overflow-hidden"
       style={{
-        background: 'linear-gradient(160deg, #1D1D1F 0%, #2C2C2E 100%)',
-        boxShadow: '0 8px 40px rgba(0,0,0,0.22)',
+        background: 'linear-gradient(160deg, #0A0A0A 0%, #1C1C1E 60%, #2C2C2E 100%)',
+        boxShadow: '0 0 0 0.5px rgba(255,255,255,0.06), 0 8px 40px rgba(0,0,0,0.6)',
       }}>
 
       {/* Decorative blur circles */}
       <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full pointer-events-none"
-        style={{ background: 'rgba(48,209,88,0.12)', filter: 'blur(30px)' }} />
+        style={{ background: 'rgba(48,209,88,0.14)', filter: 'blur(30px)' }} />
       <div className="absolute -bottom-16 -left-8 w-32 h-32 rounded-full pointer-events-none"
-        style={{ background: 'rgba(0,122,255,0.1)', filter: 'blur(24px)' }} />
+        style={{ background: 'rgba(10,132,255,0.12)', filter: 'blur(24px)' }} />
 
       <div className="relative">
         {/* Header */}
@@ -112,7 +112,7 @@ export default function SummaryPanel({ bestStore, savings, avgTotal, list, expor
             <I.Download size={14} /> Liste exportieren
           </button>
           <button className="flex items-center justify-center gap-2 py-3 rounded-[980px] text-[13px] font-[700] transition-all hover:opacity-90 active:scale-[.97]"
-            style={{ background: '#30D158', color: '#fff', boxShadow: '0 4px 16px rgba(48,209,88,0.4)' }}>
+            style={{ background: '#30D158', color: '#000', boxShadow: '0 4px 16px rgba(48,209,88,0.4)' }}>
             <I.Play size={13} /> Einkaufen starten
           </button>
         </div>

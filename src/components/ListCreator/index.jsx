@@ -11,10 +11,10 @@ export default function ListCreator({
     <div className="card p-5">
       <div className="flex items-center gap-2.5 mb-4">
         <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-          style={{ background: 'rgba(255,149,0,0.1)' }}>
-          <I.Cart size={15} color="#FF9500" />
+          style={{ background: 'rgba(255,159,10,0.12)' }}>
+          <I.Cart size={15} color="#FF9F0A" />
         </div>
-        <h2 className="text-[15px] font-[700]" style={{ color: '#1D1D1F' }}>Einkaufsliste</h2>
+        <h2 className="text-[15px] font-[700]" style={{ color: '#F5F5F7' }}>Einkaufsliste</h2>
       </div>
 
       <div className="seg-control mb-4">
