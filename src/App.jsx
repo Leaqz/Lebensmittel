@@ -4,15 +4,23 @@ import { avgPrice, effectivePrice, bestEffectivePrice, fmt } from './utils/helpe
 import { CATALOG } from './data/catalog.js';
 import { STATIC_STORES, AI_PRESETS } from './data/constants.js';
 import { getUserLocation, fetchNearbyStores } from './services/location.js';
+import { fetchCrawlStatus, fetchCrawlConfigs, updateCrawlConfig, triggerCrawl } from './services/api.js';
 import TravelPanel from './components/TravelPanel.jsx';
 import ListCreator from './components/ListCreator/index.jsx';
 import ListPanel from './components/ListPanel.jsx';
 import StorePanel from './components/StorePanel.jsx';
 import SummaryPanel from './components/SummaryPanel.jsx';
 import SwapModal from './components/SwapModal.jsx';
+import MealPlanner from './components/MealPlanner/index.jsx';
 
 const DEFAULT_RADIUS    = Number(import.meta.env.VITE_DEFAULT_RADIUS)    || 3;
 const DEFAULT_TRANSPORT = import.meta.env.VITE_DEFAULT_TRANSPORT || 'car';
+
+const TABS = [
+  { id: 'shop',    label: 'Einkaufsliste', icon: '🛒' },
+  { id: 'meals',   label: 'Mahlzeiten',    icon: '🍽️' },
+  { id: 'crawler', label: 'Crawler',        icon: '⚙️' },
+];
 
 function EmptyHero({ mode }) {
   return (
@@ -38,7 +46,155 @@ function EmptyHero({ mode }) {
   );
 }
 
+// ── Crawler admin panel ────────────────────────────────────────────────────────
+function CrawlerPanel() {
+  const [configs, setConfigs]   = useState([]);
+  const [history, setHistory]   = useState([]);
+  const [running, setRunning]   = useState(false);
+  const [loading, setLoading]   = useState(true);
+  const [toast, setToast]       = useState(null);
+
+  const load = useCallback(async () => {
+    try {
+      const [cfgs, status] = await Promise.all([fetchCrawlConfigs(), fetchCrawlStatus()]);
+      setConfigs(cfgs);
+      setHistory(status.history || []);
+      setRunning(status.is_running || false);
+    } catch {
+      setToast('⚠️ Backend nicht erreichbar');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const handleToggle = async (config, field, value) => {
+    try {
+      const updated = await updateCrawlConfig(config.id, { [field]: value });
+      setConfigs((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    } catch {
+      setToast('⚠️ Fehler beim Speichern');
+    }
+  };
+
+  const handleRun = async () => {
+    try {
+      await triggerCrawl();
+      setRunning(true);
+      setToast('🚀 Crawler gestartet!');
+      setTimeout(load, 3000);
+    } catch {
+      setToast('⚠️ Fehler beim Starten');
+    }
+  };
+
+  const statusColor = (s) => ({
+    success: 'text-emerald-600 bg-emerald-50', failed: 'text-red-600 bg-red-50',
+    running: 'text-blue-600 bg-blue-50', skipped: 'text-gray-500 bg-gray-50',
+  }[s] || 'text-gray-400');
+
+  return (
+    <div className="space-y-5">
+      {toast && (
+        <div className="bg-gray-900 text-white text-sm font-semibold px-4 py-3 rounded-2xl shadow-xl">
+          {toast}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="card p-8 text-center text-gray-400 font-semibold">
+          Verbinde mit Backend…
+        </div>
+      ) : (
+        <>
+          {/* Config table */}
+          <div className="card overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+              <h2 className="font-bold text-gray-800 text-sm">Crawler-Konfiguration</h2>
+              <button
+                onClick={handleRun}
+                disabled={running}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
+                  running ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-md shadow-emerald-200'
+                }`}
+              >
+                {running ? <><I.Spinner size={12} color="#9ca3af" /> Läuft…</> : <><I.Zap size={12} /> Crawl starten</>}
+              </button>
+            </div>
+
+            <div className="divide-y divide-gray-50">
+              {configs.length === 0 && (
+                <div className="p-6 text-center text-sm text-gray-400">
+                  Keine Konfigurationen gefunden. Stelle sicher, dass das Backend läuft und die DB initialisiert ist.
+                </div>
+              )}
+              {configs.map((cfg) => (
+                <div key={cfg.id} className="px-5 py-3 flex items-center gap-4">
+                  <div className="flex-1">
+                    <div className="font-semibold text-gray-800 text-sm">{cfg.supermarket_name}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">Max {cfg.max_items} Produkte · {cfg.delay_ms} ms Pause</div>
+                  </div>
+
+                  <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={cfg.is_enabled}
+                      onChange={(e) => handleToggle(cfg, 'is_enabled', e.target.checked)}
+                      className="rounded"
+                    />
+                    Aktiv
+                  </label>
+
+                  <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 cursor-pointer" title="Nur einmal crawlen, danach überspringen. Deaktivieren zum erneuten Crawlen.">
+                    <input
+                      type="checkbox"
+                      checked={cfg.run_once}
+                      onChange={(e) => handleToggle(cfg, 'run_once', e.target.checked)}
+                      className="rounded"
+                    />
+                    Nur einmal
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* History */}
+          {history.length > 0 && (
+            <div className="card overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-50">
+                <h2 className="font-bold text-gray-800 text-sm">Verlauf (letzte 20)</h2>
+              </div>
+              <div className="divide-y divide-gray-50 max-h-72 overflow-y-auto">
+                {history.map((h) => (
+                  <div key={h.id} className="px-5 py-2.5 flex items-center gap-3 text-xs">
+                    <span className={`font-bold px-2 py-0.5 rounded-lg ${statusColor(h.status)}`}>{h.status}</span>
+                    <span className="font-semibold text-gray-700">{h.supermarket}</span>
+                    <span className="text-gray-400">{h.items_crawled} Produkte</span>
+                    <span className="text-gray-300 ml-auto">
+                      {new Date(h.started_at).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Info box */}
+          <div className="card p-4 text-xs text-gray-500 leading-relaxed bg-blue-50 border-blue-200">
+            <div className="font-bold text-blue-700 mb-1">💡 Wie funktioniert „Nur einmal"?</div>
+            <p>Wenn <strong>Nur einmal</strong> aktiviert ist, crawlt der Crawler diesen Markt nur beim ersten Durchlauf. Deaktiviere es, damit bei jedem Aufruf neu gecrawlt wird. Die Preise in der DB bleiben bis zum nächsten Crawl erhalten.</p>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Main App ───────────────────────────────────────────────────────────────────
 export default function App() {
+  const [activeTab,     setActiveTab]     = useState('shop');
   const [radius,        setRadius]        = useState(DEFAULT_RADIUS);
   const [transport,     setTransport]     = useState(DEFAULT_TRANSPORT);
   const [list,          setList]          = useState([]);
@@ -51,19 +207,15 @@ export default function App() {
   const [swapTarget,    setSwapTarget]    = useState(null);
   const [toast,         setToast]         = useState(null);
   const [listOpen,      setListOpen]      = useState(true);
-
-  // Standort & echte Filialen
-  const [userLocation,    setUserLocation]    = useState(null);
-  const [locationStatus,  setLocationStatus]  = useState('idle'); // idle | loading | success | error
-  const [locationError,   setLocationError]   = useState(null);
-  const [realStores,      setRealStores]      = useState(null); // null = Fallback auf STATIC_STORES
+  const [userLocation,  setUserLocation]  = useState(null);
+  const [locationStatus,setLocationStatus]= useState('idle');
+  const [locationError, setLocationError] = useState(null);
+  const [realStores,    setRealStores]    = useState(null);
 
   const searchRef = useRef(null);
 
-  // Aktive Filialen: echte OSM-Daten wenn vorhanden, sonst statische Demo-Daten
   const allStores = useMemo(() => realStores || STATIC_STORES, [realStores]);
 
-  // Filialen innerhalb des Radius
   const visibleStores = useMemo(
     () => allStores.filter((s) => s.distance <= radius),
     [allStores, radius]
@@ -81,7 +233,10 @@ export default function App() {
   );
 
   const addItem = useCallback((item) => {
-    setList((prev) => [...prev, { ...item }]);
+    setList((prev) => {
+      if (prev.find((i) => i.id === item.id)) return prev;
+      return [...prev, { ...item }];
+    });
     setQuery('');
     setDropOpen(false);
     showToast(`✓ ${item.name} hinzugefügt`);
@@ -222,6 +377,25 @@ export default function App() {
               <p className="text-xs font-semibold text-emerald-500 mt-0.5">Schlau einkaufen — mehr sparen.</p>
             </div>
           </div>
+
+          {/* Tab navigation */}
+          <nav className="hidden sm:flex items-center gap-1 bg-gray-100 rounded-2xl p-1">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+
           <div className="flex items-center gap-2">
             {(() => {
               const totalDeals = list.reduce((n, item) =>
@@ -233,72 +407,113 @@ export default function App() {
               ) : null;
             })()}
             {list.length > 0 && (
-              <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-full text-xs font-bold">
-                <I.Cart size={13} /> {list.length} Artikel
-              </div>
-            )}
-            {savings > 0.005 && (
-              <div className="hidden sm:flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-full text-xs font-bold">
-                <I.TrendDown size={13} /> Spare {fmt(savings)}
-              </div>
+              <button
+                onClick={() => setActiveTab('shop')}
+                className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-emerald-100 transition-colors"
+              >
+                <I.Cart size={13} /> {list.length}
+              </button>
             )}
           </div>
+        </div>
+
+        {/* Mobile tab bar */}
+        <div className="sm:hidden flex border-t border-gray-100">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-xs font-bold transition-colors ${
+                activeTab === tab.id ? 'text-emerald-600 border-t-2 border-emerald-500' : 'text-gray-400'
+              }`}
+            >
+              <span className="text-base">{tab.icon}</span>
+              <span>{tab.label}</span>
+            </button>
+          ))}
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
-          {/* Left column */}
-          <div className="lg:col-span-4 space-y-4">
-            <TravelPanel
-              radius={radius} setRadius={setRadius}
-              transport={transport} setTransport={setTransport}
-              stores={allStores}
-              locationStatus={locationStatus}
-              locationError={locationError}
-              onLocate={handleLocate}
-            />
-            <ListCreator
-              mode={mode} setMode={setMode}
-              query={query} setQuery={setQuery}
-              dropOpen={dropOpen} setDropOpen={setDropOpen}
-              searchRef={searchRef} searchResults={searchResults} addItem={addItem}
-              aiForm={aiForm} setAiForm={setAiForm}
-              aiLoading={aiLoading} aiDone={aiDone} generateAI={generateAI}
-            />
-          </div>
+        {/* ── SHOP TAB ── */}
+        {activeTab === 'shop' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <div className="lg:col-span-4 space-y-4">
+              <TravelPanel
+                radius={radius} setRadius={setRadius}
+                transport={transport} setTransport={setTransport}
+                stores={allStores}
+                locationStatus={locationStatus}
+                locationError={locationError}
+                onLocate={handleLocate}
+              />
+              <ListCreator
+                mode={mode} setMode={setMode}
+                query={query} setQuery={setQuery}
+                dropOpen={dropOpen} setDropOpen={setDropOpen}
+                searchRef={searchRef} searchResults={searchResults} addItem={addItem}
+                aiForm={aiForm} setAiForm={setAiForm}
+                aiLoading={aiLoading} aiDone={aiDone} generateAI={generateAI}
+              />
+            </div>
 
-          {/* Right column */}
-          <div className="lg:col-span-8 space-y-4">
-            {list.length > 0 && (
-              <ListPanel
-                list={list}
-                visibleStores={visibleStores}
+            <div className="lg:col-span-8 space-y-4">
+              {list.length > 0 && (
+                <ListPanel
+                  list={list}
+                  visibleStores={visibleStores}
+                  bestStore={bestStore}
+                  listOpen={listOpen} setListOpen={setListOpen}
+                  removeItem={removeItem} setSwapTarget={setSwapTarget}
+                />
+              )}
+              <StorePanel
+                visStoreTotals={visStoreTotals}
                 bestStore={bestStore}
-                listOpen={listOpen} setListOpen={setListOpen}
-                removeItem={removeItem} setSwapTarget={setSwapTarget}
-              />
-            )}
-            <StorePanel
-              visStoreTotals={visStoreTotals}
-              bestStore={bestStore}
-              list={list}
-              transport={transport}
-              radius={radius}
-            />
-            {list.length > 0 && (
-              <SummaryPanel
-                bestStore={bestStore}
-                savings={savings}
-                avgTotal={avgTotal}
                 list={list}
-                exportList={exportList}
+                transport={transport}
+                radius={radius}
               />
-            )}
-            {list.length === 0 && <EmptyHero mode={mode} />}
+              {list.length > 0 && (
+                <SummaryPanel
+                  bestStore={bestStore}
+                  savings={savings}
+                  avgTotal={avgTotal}
+                  list={list}
+                  exportList={exportList}
+                />
+              )}
+              {list.length === 0 && <EmptyHero mode={mode} />}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* ── MEALS TAB ── */}
+        {activeTab === 'meals' && (
+          <div>
+            <div className="mb-5">
+              <h2 className="font-extrabold text-gray-900 text-xl">Mahlzeiten planen</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Wähle eine Mahlzeit, stelle die Portionen ein und füge die Zutaten direkt zur Einkaufsliste hinzu.
+              </p>
+            </div>
+            <MealPlanner visibleStores={visibleStores} addItem={addItem} />
+          </div>
+        )}
+
+        {/* ── CRAWLER TAB ── */}
+        {activeTab === 'crawler' && (
+          <div>
+            <div className="mb-5">
+              <h2 className="font-extrabold text-gray-900 text-xl">Crawler-Verwaltung</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Verwalte die Daten-Crawler für deutsche Supermärkte. Benötigt das laufende Backend (Docker).
+              </p>
+            </div>
+            <CrawlerPanel />
+          </div>
+        )}
       </main>
     </div>
   );
