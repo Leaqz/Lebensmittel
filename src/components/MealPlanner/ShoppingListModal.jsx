@@ -5,11 +5,11 @@ import { I } from "../../utils/icons.jsx";
 
 const STORES = ["aldi", "lidl", "rewe", "edeka"];
 const STORE_LABELS = { aldi: "Aldi", lidl: "Lidl", rewe: "REWE", edeka: "EDEKA" };
-const STORE_COLORS = {
-  aldi:  { bg: "bg-blue-50",   text: "text-blue-700",  border: "border-blue-200"  },
-  lidl:  { bg: "bg-red-50",    text: "text-red-700",   border: "border-red-200"   },
-  rewe:  { bg: "bg-rose-50",   text: "text-rose-700",  border: "border-rose-200"  },
-  edeka: { bg: "bg-yellow-50", text: "text-yellow-800",border: "border-yellow-200"},
+const STORE_STYLES = {
+  aldi:  { bg: 'rgba(0,48,135,0.07)',  color: '#003087', border: 'rgba(0,48,135,0.18)' },
+  lidl:  { bg: 'rgba(192,0,0,0.07)',   color: '#c00000', border: 'rgba(192,0,0,0.18)'  },
+  rewe:  { bg: 'rgba(204,0,0,0.07)',   color: '#cc0000', border: 'rgba(204,0,0,0.18)'  },
+  edeka: { bg: 'rgba(200,130,0,0.09)', color: '#8a5a00', border: 'rgba(200,130,0,0.2)' },
 };
 
 function fmtQty(qty, unit) {
@@ -35,7 +35,6 @@ export default function ShoppingListModal({ meal, servings, shoppingList, onClos
     [visibleStores]
   );
 
-  // Build enriched list: each ingredient + prices from catalog
   const enriched = useMemo(() => {
     if (!shoppingList) return [];
     return shoppingList.map((ing) => {
@@ -55,7 +54,6 @@ export default function ShoppingListModal({ meal, servings, shoppingList, onClos
     });
   }, [shoppingList, activeStoreIds]);
 
-  // Total per store
   const storeTotals = useMemo(() => {
     const totals = {};
     activeStoreIds.forEach((sid) => { totals[sid] = 0; });
@@ -74,7 +72,6 @@ export default function ShoppingListModal({ meal, servings, shoppingList, onClos
     activeStoreIds[0]
   );
 
-  // Items to add to main shopping list
   const itemsToAdd = useMemo(() =>
     enriched
       .filter((ing) => ing.catalogItem && !ing.is_optional)
@@ -84,77 +81,107 @@ export default function ShoppingListModal({ meal, servings, shoppingList, onClos
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 sm:p-6"
-      style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+      style={{ background: "rgba(0,0,0,0.48)", backdropFilter: "blur(10px)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-white rounded-[24px] w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden"
+        style={{ boxShadow: '0 24px 80px rgba(0,0,0,0.26)' }}>
 
         {/* Header */}
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
+        <div className="flex items-center gap-3 px-6 py-5"
+          style={{ borderBottom: '0.5px solid rgba(0,0,0,0.07)' }}>
           <span className="text-3xl">{meal.image_emoji}</span>
           <div className="flex-1 min-w-0">
-            <h2 className="font-extrabold text-gray-900 text-lg leading-tight truncate">
+            <h2 className="font-[800] text-[18px] leading-tight truncate" style={{ color: '#1D1D1F' }}>
               {meal.name_de || meal.name}
             </h2>
-            <p className="text-xs text-gray-400 font-semibold mt-0.5">
+            <p className="text-[12px] font-[600] mt-0.5" style={{ color: '#AEAEB2' }}>
               {meal.cuisine} · {servings} {servings === 1 ? "Person" : "Personen"}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 flex items-center justify-center rounded-2xl bg-gray-100 hover:bg-gray-200 transition-colors text-gray-500"
+            className="w-9 h-9 flex items-center justify-center rounded-full transition-colors"
+            style={{ background: 'rgba(0,0,0,0.06)', color: '#6E6E73' }}
           >
             ✕
           </button>
         </div>
 
-        {/* Store totals summary */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 px-6 py-3 bg-gray-50 border-b border-gray-100">
+        {/* Store totals */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 px-6 py-3"
+          style={{ background: '#F5F5F7', borderBottom: '0.5px solid rgba(0,0,0,0.07)' }}>
           {activeStoreIds.map((sid) => {
-            const c = STORE_COLORS[sid] || STORE_COLORS.rewe;
+            const s = STORE_STYLES[sid] || STORE_STYLES.rewe;
             const isBest = sid === cheapestStoreOverall;
             return (
-              <div key={sid} className={`rounded-xl px-3 py-2 border text-center ${c.bg} ${c.border} ${isBest ? "ring-2 ring-emerald-400" : ""}`}>
-                {isBest && <div className="text-xs font-extrabold text-emerald-600 mb-0.5">Günstigste</div>}
-                <div className={`text-xs font-bold ${c.text}`}>{STORE_LABELS[sid] || sid}</div>
-                <div className="text-sm font-extrabold text-gray-800">{fmt(storeTotals[sid])}</div>
+              <div key={sid} className="rounded-[14px] px-3 py-2.5 text-center transition-all"
+                style={{
+                  background: s.bg,
+                  border: isBest ? `1.5px solid ${s.border}` : `0.5px solid ${s.border}`,
+                  boxShadow: isBest ? `0 0 0 2px #30D158` : 'none',
+                }}>
+                {isBest && (
+                  <div className="text-[10px] font-[800] mb-0.5" style={{ color: '#30D158' }}>Günstigste</div>
+                )}
+                <div className="text-[12px] font-[700]" style={{ color: s.color }}>
+                  {STORE_LABELS[sid] || sid}
+                </div>
+                <div className="text-[15px] font-[800]" style={{ color: '#1D1D1F', fontVariantNumeric: 'tabular-nums' }}>
+                  {fmt(storeTotals[sid])}
+                </div>
               </div>
             );
           })}
         </div>
 
         {/* Ingredient list */}
-        <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
-          {enriched.map((ing) => (
-            <div key={ing.name} className={`px-6 py-3 ${ing.is_optional ? "opacity-60" : ""}`}>
+        <div className="flex-1 overflow-y-auto">
+          {enriched.map((ing, i) => (
+            <div key={ing.name}
+              className="px-6 py-3"
+              style={{
+                opacity: ing.is_optional ? 0.55 : 1,
+                borderBottom: i < enriched.length - 1 ? '0.5px solid rgba(0,0,0,0.05)' : 'none',
+              }}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-gray-800">{ing.name}</span>
+                    <span className="text-[14px] font-[600]" style={{ color: '#1D1D1F' }}>{ing.name}</span>
                     {ing.is_optional && (
-                      <span className="text-xs bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-md">optional</span>
+                      <span className="text-[11px] font-[500] px-1.5 py-0.5 rounded-[6px]"
+                        style={{ background: '#F2F2F7', color: '#AEAEB2' }}>optional</span>
                     )}
                   </div>
-                  <div className="text-xs text-gray-400 mt-0.5">
+                  <div className="text-[12px] mt-0.5" style={{ color: '#AEAEB2' }}>
                     {fmtQty(ing.quantity, ing.unit)}
                     {ing.notes && <span className="ml-1">· {ing.notes}</span>}
                   </div>
                   {ing.catalogItem && (
-                    <div className="text-xs text-gray-500 mt-0.5 italic truncate">{ing.catalogItem.name}</div>
+                    <div className="text-[11px] mt-0.5 italic truncate" style={{ color: '#6E6E73' }}>
+                      {ing.catalogItem.name}
+                    </div>
                   )}
                 </div>
 
-                {/* Per-store price chips */}
                 <div className="flex flex-wrap gap-1 justify-end shrink-0">
                   {activeStoreIds.map((sid) => {
                     const p = ing.pricesPerStore[sid];
                     if (p == null) return (
-                      <span key={sid} className="text-xs px-1.5 py-0.5 bg-gray-50 text-gray-300 rounded-lg">—</span>
+                      <span key={sid} className="text-[11px] px-1.5 py-0.5 rounded-[7px]"
+                        style={{ background: '#F2F2F7', color: '#D1D1D6' }}>—</span>
                     );
                     const isCheapest = p === ing.cheapestPrice;
-                    const c = STORE_COLORS[sid] || STORE_COLORS.rewe;
+                    const s = STORE_STYLES[sid] || STORE_STYLES.rewe;
                     return (
-                      <span key={sid} className={`text-xs px-2 py-0.5 rounded-lg font-bold border ${c.bg} ${c.text} ${c.border} ${isCheapest ? "ring-1 ring-emerald-400" : ""}`}>
+                      <span key={sid}
+                        className="text-[11px] px-2 py-0.5 rounded-[7px] font-[700]"
+                        style={{
+                          background: s.bg,
+                          color: s.color,
+                          border: isCheapest ? `1.5px solid ${s.border}` : `0.5px solid ${s.border}`,
+                          boxShadow: isCheapest ? '0 0 0 1.5px #30D158' : 'none',
+                        }}>
                         {fmt(p)}
                       </span>
                     );
@@ -166,16 +193,23 @@ export default function ShoppingListModal({ meal, servings, shoppingList, onClos
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100 flex items-center gap-3">
-          <div className="flex-1 text-xs text-gray-400">
-            Günstigste Option: <span className="font-extrabold text-gray-700">
+        <div className="px-6 py-4 flex items-center gap-3"
+          style={{ borderTop: '0.5px solid rgba(0,0,0,0.07)' }}>
+          <div className="flex-1 text-[12px]" style={{ color: '#AEAEB2' }}>
+            Günstigste Option:{' '}
+            <span className="font-[700]" style={{ color: '#1D1D1F' }}>
               {STORE_LABELS[cheapestStoreOverall] || cheapestStoreOverall}
-            </span> für <span className="font-extrabold text-emerald-600">{fmt(storeTotals[cheapestStoreOverall])}</span>
+            </span>{' '}
+            für{' '}
+            <span className="font-[800]" style={{ color: '#30D158', fontVariantNumeric: 'tabular-nums' }}>
+              {fmt(storeTotals[cheapestStoreOverall])}
+            </span>
           </div>
           <button
             onClick={() => { onAddAll(itemsToAdd); onClose(); }}
             disabled={!itemsToAdd.length}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-extrabold transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-emerald-200"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-[980px] text-[14px] font-[700] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ background: '#30D158', color: '#fff', boxShadow: '0 4px 16px rgba(48,209,88,0.4)' }}
           >
             <I.Cart size={15} color="white" />
             Alle zur Liste

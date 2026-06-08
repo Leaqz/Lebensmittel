@@ -18,7 +18,6 @@ export default function MealPlanner({ visibleStores, addItem }) {
   const [search, setSearch]             = useState("");
   const [apiAvailable, setApiAvailable] = useState(false);
 
-  // Load meals — try API first, fall back to static data
   useEffect(() => {
     (async () => {
       try {
@@ -33,7 +32,6 @@ export default function MealPlanner({ visibleStores, addItem }) {
     })();
   }, []);
 
-  // Load shopping list when a meal is selected
   useEffect(() => {
     if (!selectedMeal) return;
     setShoppingList(null);
@@ -70,7 +68,6 @@ export default function MealPlanner({ visibleStores, addItem }) {
     items.forEach((item) => addItem(item));
   }, [addItem]);
 
-  // Filtered meals
   const filtered = meals.filter((m) => {
     const matchSearch = !search || m.name.toLowerCase().includes(search.toLowerCase()) || m.cuisine?.toLowerCase().includes(search.toLowerCase());
     const matchTag    = activeTag === "Alle" || (m.tags && m.tags.includes(activeTag));
@@ -83,14 +80,29 @@ export default function MealPlanner({ visibleStores, addItem }) {
       <div className="card p-4 mb-5">
         <div className="relative mb-3">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-            <I.Search size={15} color="#9ca3af" />
+            <I.Search size={15} color="#AEAEB2" />
           </div>
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Mahlzeit suchen…"
-            className="w-full pl-9 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-400 focus:bg-white transition-colors"
+            className="w-full pl-9 pr-4 py-2.5 rounded-[12px] outline-none transition-all text-[14px] font-[500]"
+            style={{
+              background: '#F2F2F7',
+              border: '1px solid rgba(0,0,0,0.08)',
+              color: '#1D1D1F',
+            }}
+            onFocus={(e) => {
+              e.target.style.background = '#fff';
+              e.target.style.border = '1.5px solid #30D158';
+              e.target.style.boxShadow = '0 0 0 3px rgba(48,209,88,0.10)';
+            }}
+            onBlur={(e) => {
+              e.target.style.background = '#F2F2F7';
+              e.target.style.border = '1px solid rgba(0,0,0,0.08)';
+              e.target.style.boxShadow = 'none';
+            }}
           />
         </div>
 
@@ -99,11 +111,11 @@ export default function MealPlanner({ visibleStores, addItem }) {
             <button
               key={tag}
               onClick={() => setActiveTag(tag)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                activeTag === tag
-                  ? "bg-emerald-500 text-white shadow-md shadow-emerald-200"
-                  : "bg-gray-100 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600"
-              }`}
+              className="px-3 py-1.5 rounded-[980px] text-[12px] font-[700] transition-all"
+              style={activeTag === tag
+                ? { background: '#30D158', color: '#fff', boxShadow: '0 2px 10px rgba(48,209,88,0.35)' }
+                : { background: '#F2F2F7', color: '#6E6E73' }
+              }
             >
               {tag}
             </button>
@@ -111,23 +123,22 @@ export default function MealPlanner({ visibleStores, addItem }) {
         </div>
       </div>
 
-      {/* Status badge */}
       {!apiAvailable && (
-        <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-4 font-semibold">
-          <I.Info size={13} color="#b45309" />
+        <div className="flex items-center gap-2 rounded-[12px] px-3 py-2.5 mb-4 text-[12px] font-[600]"
+          style={{ background: 'rgba(255,149,0,0.08)', border: '0.5px solid rgba(255,149,0,0.2)', color: '#B36200' }}>
+          <I.Info size={13} color="#FF9500" />
           Backend nicht verbunden — statische Rezeptdaten werden verwendet.
         </div>
       )}
 
-      {/* Meal grid */}
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="shimmer-bg h-48 rounded-2xl" />
+            <div key={i} className="shimmer-bg h-48 rounded-[18px]" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="card p-12 text-center text-gray-400 text-sm font-semibold">
+        <div className="card p-12 text-center text-[14px] font-[600]" style={{ color: '#AEAEB2' }}>
           Keine Mahlzeiten gefunden 🤔
         </div>
       ) : (
@@ -148,31 +159,39 @@ export default function MealPlanner({ visibleStores, addItem }) {
         </div>
       )}
 
-      {/* Servings panel — shown below grid when a meal is selected */}
       {selectedMeal && (
         <div className="card p-4 mt-4 flex items-center gap-4">
-          <span className="text-sm font-bold text-gray-600 shrink-0">Portionen:</span>
-          <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
+          <span className="text-[14px] font-[700] shrink-0" style={{ color: '#6E6E73' }}>Portionen:</span>
+          <div className="flex items-center rounded-[12px] overflow-hidden"
+            style={{ background: '#F2F2F7', border: '0.5px solid rgba(0,0,0,0.08)' }}>
             <button
               onClick={() => setServings((s) => Math.max(1, s - 1))}
-              className="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-200 font-bold text-lg transition-colors"
+              className="w-9 h-9 flex items-center justify-center font-[700] text-lg transition-colors"
+              style={{ color: '#6E6E73' }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.06)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             >−</button>
-            <span className="w-10 text-center font-extrabold text-gray-800 text-sm">{servings}</span>
+            <span className="w-10 text-center font-[800] text-[14px]" style={{ color: '#1D1D1F' }}>{servings}</span>
             <button
               onClick={() => setServings((s) => Math.min(20, s + 1))}
-              className="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-200 font-bold text-lg transition-colors"
+              className="w-9 h-9 flex items-center justify-center font-[700] text-lg transition-colors"
+              style={{ color: '#6E6E73' }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.06)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             >+</button>
           </div>
           <button
             onClick={() => setSelectedMeal(null)}
-            className="ml-auto text-xs text-gray-400 hover:text-gray-600 font-semibold"
+            className="ml-auto text-[12px] font-[600] transition-colors"
+            style={{ color: '#AEAEB2' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#6E6E73'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#AEAEB2'}
           >
             Auswahl aufheben ✕
           </button>
         </div>
       )}
 
-      {/* Shopping list modal */}
       {selectedMeal && (
         <ShoppingListModal
           meal={selectedMeal}

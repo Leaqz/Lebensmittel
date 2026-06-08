@@ -8,64 +8,112 @@ export default function SummaryPanel({ bestStore, savings, avgTotal, list, expor
   );
 
   return (
-    <div
-      className="rounded-3xl p-5 text-white relative overflow-hidden"
-      style={{ background: 'linear-gradient(135deg,#059669 0%,#10b981 50%,#34d399 100%)' }}
-    >
-      <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/10 pointer-events-none" />
-      <div className="absolute -bottom-10 -left-4 w-24 h-24 rounded-full bg-white/10 pointer-events-none" />
+    <div className="rounded-[22px] p-6 relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(160deg, #1D1D1F 0%, #2C2C2E 100%)',
+        boxShadow: '0 8px 40px rgba(0,0,0,0.22)',
+      }}>
+
+      {/* Decorative blur circles */}
+      <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full pointer-events-none"
+        style={{ background: 'rgba(48,209,88,0.12)', filter: 'blur(30px)' }} />
+      <div className="absolute -bottom-16 -left-8 w-32 h-32 rounded-full pointer-events-none"
+        style={{ background: 'rgba(0,122,255,0.1)', filter: 'blur(24px)' }} />
 
       <div className="relative">
-        <div className="flex items-center gap-2 mb-4">
-          <I.Award size={18} color="white" />
-          <h2 className="font-extrabold text-base">Deine Ersparnis-Übersicht</h2>
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-5">
+          <div className="w-8 h-8 rounded-[10px] flex items-center justify-center"
+            style={{ background: 'rgba(48,209,88,0.2)' }}>
+            <I.Award size={16} color="#30D158" />
+          </div>
+          <h2 className="font-[700] text-[15px]" style={{ color: 'rgba(255,255,255,0.9)' }}>
+            Deine Ersparnis-Übersicht
+          </h2>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        {/* Stats grid */}
+        <div className="grid grid-cols-3 gap-3 mb-5">
           {[
-            { label: 'Gesamtpreis', value: bestStore ? fmt(bestStore.total) : '—', sub: bestStore?.name || 'Kein Markt' },
-            { label: 'Du sparst',   value: fmt(savings), sub: `${pct.toFixed(0)}% günstiger`, accent: savings > 0.005 },
-            { label: 'Angebote',    value: totalSaleCount, sub: 'auf deine Artikel' },
+            {
+              label: 'Gesamtpreis',
+              value: bestStore ? fmt(bestStore.total) : '—',
+              sub: bestStore?.name || 'Kein Markt',
+              accent: false,
+            },
+            {
+              label: 'Du sparst',
+              value: fmt(savings),
+              sub: `${pct.toFixed(0)}% günstiger`,
+              accent: savings > 0.005,
+            },
+            {
+              label: 'Angebote',
+              value: totalSaleCount,
+              sub: 'auf deine Artikel',
+              accent: false,
+            },
           ].map((s, i) => (
-            <div key={i} className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 text-center border border-white/20">
-              <p className="text-emerald-100 text-xs font-medium mb-1">{s.label}</p>
-              <p className={`text-xl font-extrabold ${s.accent ? 'text-amber-300' : 'text-white'}`}>{s.value}</p>
-              <p className="text-emerald-200 text-xs mt-1 truncate">{s.sub}</p>
+            <div key={i} className="rounded-[16px] p-3.5 text-center"
+              style={{
+                background: 'rgba(255,255,255,0.07)',
+                backdropFilter: 'blur(12px)',
+                border: '0.5px solid rgba(255,255,255,0.12)',
+              }}>
+              <p className="text-[11px] font-[500] mb-1.5" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                {s.label}
+              </p>
+              <p className="font-[800] tracking-[-0.03em] leading-none"
+                style={{
+                  fontSize: '22px',
+                  color: s.accent ? '#FFD60A' : '#fff',
+                  fontVariantNumeric: 'tabular-nums',
+                }}>
+                {s.value}
+              </p>
+              <p className="text-[11px] mt-1.5 truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>{s.sub}</p>
             </div>
           ))}
         </div>
 
+        {/* Savings callout */}
         {savings > 0.005 && (
-          <div className="flex items-center gap-2 bg-white/15 border border-white/20 rounded-2xl px-3 py-2.5 mb-4 text-sm font-semibold">
-            <I.TrendDown size={16} color="#fcd34d" />
-            <span>
-              Bei <span className="font-extrabold">{bestStore?.name}</span> sparst du{' '}
-              <span className="text-amber-300 font-extrabold">{fmt(savings)}</span> gegenüber dem Durchschnittspreis
+          <div className="flex items-center gap-2.5 rounded-[14px] px-4 py-3 mb-5"
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '0.5px solid rgba(255,255,255,0.1)',
+            }}>
+            <I.TrendDown size={15} color="#FFD60A" />
+            <span className="text-[13px] font-[500]" style={{ color: 'rgba(255,255,255,0.8)' }}>
+              Bei <span className="font-[700] text-white">{bestStore?.name}</span> sparst du{' '}
+              <span className="font-[800]" style={{ color: '#FFD60A' }}>{fmt(savings)}</span>{' '}
+              gegenüber dem Durchschnitt
             </span>
           </div>
         )}
 
-        <div className="mb-4">
-          <div className="flex justify-between text-xs text-emerald-200 mb-1.5 font-medium">
+        {/* Progress bar */}
+        <div className="mb-5">
+          <div className="flex justify-between text-[11px] mb-2 font-[500]"
+            style={{ color: 'rgba(255,255,255,0.4)' }}>
             <span>Ersparnis-Rate</span><span>{pct.toFixed(0)}%</span>
           </div>
-          <div className="h-2.5 bg-white/20 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-amber-300 rounded-full transition-all duration-700"
-              style={{ width: `${Math.min(100, pct)}%` }}
-            />
+          <div className="h-[4px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.12)' }}>
+            <div className="h-full rounded-full transition-all duration-700"
+              style={{ width: `${Math.min(100, pct)}%`, background: '#30D158' }} />
           </div>
         </div>
 
+        {/* Action buttons */}
         <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={exportList}
-            className="btn-ghost flex items-center justify-center gap-2 py-3 text-sm font-bold"
-          >
-            <I.Download size={16} /> Liste exportieren
+          <button onClick={exportList}
+            className="flex items-center justify-center gap-2 py-3 rounded-[980px] text-[13px] font-[700] transition-all hover:opacity-80"
+            style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.85)', border: '0.5px solid rgba(255,255,255,0.15)' }}>
+            <I.Download size={14} /> Liste exportieren
           </button>
-          <button className="bg-white text-emerald-700 hover:bg-emerald-50 rounded-2xl py-3 text-sm font-extrabold flex items-center justify-center gap-2 shadow-lg transition-all hover:scale-[1.02] active:scale-[.97]">
-            <I.Play size={15} /> Einkaufen starten
+          <button className="flex items-center justify-center gap-2 py-3 rounded-[980px] text-[13px] font-[700] transition-all hover:opacity-90 active:scale-[.97]"
+            style={{ background: '#30D158', color: '#fff', boxShadow: '0 4px 16px rgba(48,209,88,0.4)' }}>
+            <I.Play size={13} /> Einkaufen starten
           </button>
         </div>
       </div>

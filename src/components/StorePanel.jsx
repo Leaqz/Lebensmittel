@@ -20,119 +20,138 @@ export default function StorePanel({ visStoreTotals, bestStore, list, transport,
 
   return (
     <div className="card p-5">
-      <div className="flex items-center gap-2.5 mb-4">
-        <div className="w-8 h-8 rounded-xl bg-violet-100 flex items-center justify-center">
-          <I.Store size={15} color="#7c3aed" />
+      <div className="flex items-center gap-2.5 mb-5">
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+          style={{ background: 'rgba(88,86,214,0.1)' }}>
+          <I.Store size={15} color="#5856D6" />
         </div>
-        <h2 className="font-bold text-gray-800 text-sm">Preisvergleich</h2>
+        <h2 className="text-[15px] font-[700]" style={{ color: '#1D1D1F' }}>Preisvergleich</h2>
         {visStoreTotals.length === 0 && (
-          <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full font-medium">
-            Radius erhöhen für mehr Filialen
+          <span className="text-[12px] font-[500] px-2.5 py-1 rounded-full ml-1"
+            style={{ background: '#F2F2F7', color: '#6E6E73' }}>
+            Radius erhöhen
           </span>
         )}
       </div>
 
       {visStoreTotals.length === 0 ? (
-        <div className="flex flex-col items-center py-10 text-gray-400">
-          <I.MapPin size={36} color="#d1d5db" />
-          <p className="text-sm font-medium mt-3">Keine Filialen im Umkreis</p>
-          <p className="text-xs mt-1">Regler nach rechts verschieben oder Standort ermitteln</p>
+        <div className="flex flex-col items-center py-12" style={{ color: '#AEAEB2' }}>
+          <I.MapPin size={40} color="#D1D1D6" />
+          <p className="text-[14px] font-[500] mt-3" style={{ color: '#6E6E73' }}>Keine Filialen im Umkreis</p>
+          <p className="text-[12px] mt-1">Regler nach rechts verschieben oder Standort ermitteln</p>
         </div>
       ) : (
         <>
+          {/* Store cards grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
             {visStoreTotals.map((store) => {
               const isBest = bestStore?.id === store.id && list.length > 0;
-              const mins = travel(store.distance, transport);
-              const diff = isBest || !bestStore ? 0 : store.total - bestStore.total;
+              const mins   = travel(store.distance, transport);
+              const diff   = isBest || !bestStore ? 0 : store.total - bestStore.total;
+
               return (
-                <div
-                  key={store.id}
-                  className={`relative rounded-2xl border-2 p-4 transition-all ${
-                    isBest
-                      ? 'border-emerald-400 shadow-lg shadow-emerald-100 scale-[1.03]'
-                      : 'border-gray-100 hover:border-gray-200 hover:shadow-sm'
-                  }`}
-                  style={isBest ? { background: 'linear-gradient(135deg,#f0fdf4,#fff)' } : { background: '#fafafa' }}
+                <div key={store.id} className="relative rounded-[18px] p-4 transition-all duration-200"
+                  style={isBest ? {
+                    background: '#fff',
+                    boxShadow: '0 0 0 1.5px #30D158, 0 8px 32px rgba(48,209,88,0.15)',
+                    transform: 'scale(1.025)',
+                  } : {
+                    background: '#F2F2F7',
+                    boxShadow: 'none',
+                  }}
                 >
                   {isBest && list.length > 0 && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap bg-emerald-500 text-white text-xs font-extrabold px-2.5 py-1 rounded-full shadow flex items-center gap-1">
-                      <I.Award size={10} color="white" /> Bestes Angebot
+                    <div className="absolute -top-[14px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-[700] px-2.5 py-1 rounded-[980px] flex items-center gap-1"
+                      style={{ background: '#30D158', color: '#fff', boxShadow: '0 2px 8px rgba(48,209,88,0.4)' }}>
+                      <I.Award size={9} color="white" /> Beste Wahl
                     </div>
                   )}
 
+                  {/* Store identity */}
                   <div className="flex items-center gap-2 mb-3">
-                    <div className={`w-9 h-9 ${store.logoCls} rounded-xl flex items-center justify-center text-white font-black text-sm shadow-sm`}>
+                    <div className={`w-9 h-9 ${store.logoCls} rounded-[10px] flex items-center justify-center text-white font-[800] text-[13px]`}
+                      style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.18)' }}>
                       {(store.name || '?')[0]}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-extrabold text-gray-800 text-xs truncate">{store.name}</p>
-                      <p className="text-xs text-gray-400 truncate leading-none mt-0.5">{store.tagline}</p>
+                      <p className="text-[13px] font-[700] truncate" style={{ color: '#1D1D1F' }}>{store.name}</p>
+                      <p className="text-[11px] truncate leading-none mt-0.5" style={{ color: '#AEAEB2' }}>{store.tagline}</p>
                     </div>
                   </div>
 
-                  <div className={`text-xl font-extrabold ${isBest ? 'text-emerald-600' : 'text-gray-700'}`}>
+                  {/* Price — big and bold */}
+                  <div className="font-[800] tracking-[-0.03em] leading-none"
+                    style={{ fontSize: '26px', color: isBest ? '#30D158' : '#1D1D1F', fontVariantNumeric: 'tabular-nums' }}>
                     {list.length > 0
                       ? fmt(store.total)
-                      : <span className="text-gray-300 text-sm font-medium">Artikel hinzufügen</span>
+                      : <span className="text-[13px] font-[400]" style={{ color: '#D1D1D6' }}>Artikel hinzufügen</span>
                     }
                   </div>
                   {list.length > 0 && diff > 0.005 && (
-                    <p className="text-xs text-red-400 font-bold mt-0.5">+{fmt(diff)} mehr</p>
+                    <p className="text-[11px] font-[600] mt-1" style={{ color: '#FF3B30' }}>+{fmt(diff)}</p>
                   )}
 
-                  <div className="flex items-center justify-between mt-2 text-xs text-gray-400">
+                  {/* Footer */}
+                  <div className="flex items-center justify-between mt-3 text-[11px]" style={{ color: '#AEAEB2' }}>
                     <span className="flex items-center gap-1">
-                      <I.MapPin size={10} />{store.distance} km · {mins} min
+                      <I.MapPin size={9} />{store.distance} km · {mins} min
                     </span>
                     {store.saleCount > 0 && (
-                      <span className="sale-badge flex items-center gap-1 bg-red-500 text-white font-extrabold px-1.5 py-0.5 rounded-lg">
-                        <I.Percent size={9} color="white" />{store.saleCount}
+                      <span className="sale-badge flex items-center gap-1 text-[10px] font-[700] px-1.5 py-0.5 rounded-[6px]"
+                        style={{ background: '#FF3B30', color: '#fff' }}>
+                        <I.Percent size={8} color="white" />{store.saleCount}
                       </span>
                     )}
                   </div>
 
                   {store.address && (
-                    <p className="text-xs text-gray-400 mt-1.5 truncate">{store.address}</p>
+                    <p className="text-[11px] mt-1.5 truncate" style={{ color: '#AEAEB2' }}>{store.address}</p>
                   )}
                 </div>
               );
             })}
           </div>
 
+          {/* Active deals */}
           {activeDeals.length > 0 && (
-            <div className="border-t border-gray-100 pt-4">
+            <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.06)', paddingTop: '16px' }}>
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-6 h-6 rounded-lg bg-red-100 flex items-center justify-center">
-                  <I.Fire size={13} color="#ef4444" />
+                <div className="w-6 h-6 rounded-[8px] flex items-center justify-center"
+                  style={{ background: 'rgba(255,59,48,0.1)' }}>
+                  <I.Fire size={12} color="#FF3B30" />
                 </div>
-                <p className="text-xs font-extrabold text-gray-700 uppercase tracking-wider">Angebote dieser Woche</p>
-                <span className="sale-badge bg-red-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full">
+                <p className="text-[12px] font-[700] uppercase tracking-wider" style={{ color: '#1D1D1F' }}>
+                  Angebote dieser Woche
+                </p>
+                <span className="sale-badge text-[11px] font-[700] px-2 py-0.5 rounded-[980px]"
+                  style={{ background: '#FF3B30', color: '#fff' }}>
                   {activeDeals.length}
                 </span>
               </div>
               <div className="space-y-2">
                 {activeDeals.map((d, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 bg-gradient-to-r from-red-50 to-white border border-red-100 rounded-xl px-3 py-2.5 anim-pop"
-                    style={{ animationDelay: `${i * 50}ms` }}
-                  >
-                    <div className={`w-7 h-7 ${d.store.logoCls} rounded-lg flex items-center justify-center text-white font-black text-xs shrink-0`}>
+                  <div key={i} className="flex items-center gap-3 rounded-[14px] px-3 py-2.5 anim-pop"
+                    style={{
+                      background: 'rgba(255,59,48,0.04)',
+                      border: '0.5px solid rgba(255,59,48,0.12)',
+                      animationDelay: `${i * 45}ms`,
+                    }}>
+                    <div className={`w-7 h-7 ${d.store.logoCls} rounded-[8px] flex items-center justify-center text-white font-[800] text-[11px] shrink-0`}>
                       {(d.store.name || '?')[0]}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-gray-800 truncate">{d.item.name}</p>
-                      <p className="text-xs text-gray-400">{d.store.name}</p>
+                      <p className="text-[13px] font-[600] truncate" style={{ color: '#1D1D1F' }}>{d.item.name}</p>
+                      <p className="text-[11px]" style={{ color: '#6E6E73' }}>{d.store.name}</p>
                     </div>
                     <div className="text-right shrink-0">
                       {d.salePrice != null ? (
                         <div>
-                          <del className="text-xs text-gray-400">{fmt(d.regularPrice)}</del>
-                          <div className="text-sm font-extrabold text-red-600">{fmt(d.salePrice)}</div>
+                          <del className="text-[11px]">{fmt(d.regularPrice)}</del>
+                          <div className="text-[14px] font-[800]" style={{ color: '#FF3B30' }}>{fmt(d.salePrice)}</div>
                         </div>
                       ) : (
-                        <span className="text-xs font-extrabold text-red-600 bg-red-100 px-2 py-0.5 rounded-lg">
+                        <span className="text-[11px] font-[700] px-2 py-0.5 rounded-[8px]"
+                          style={{ background: 'rgba(255,59,48,0.1)', color: '#FF3B30' }}>
                           {d.label}
                         </span>
                       )}
@@ -144,8 +163,9 @@ export default function StorePanel({ visStoreTotals, bestStore, list, transport,
           )}
 
           {list.length > 0 && activeDeals.length === 0 && (
-            <div className="border-t border-gray-100 pt-4 text-center text-xs text-gray-400 py-2 flex items-center justify-center gap-1.5">
-              <I.Info size={13} color="#9ca3af" /> Keine aktuellen Angebote für deine Artikel in diesem Umkreis
+            <div className="flex items-center justify-center gap-1.5 text-[12px] pt-4"
+              style={{ borderTop: '0.5px solid rgba(0,0,0,0.06)', color: '#AEAEB2' }}>
+              <I.Info size={12} color="#AEAEB2" /> Keine aktuellen Angebote in diesem Umkreis
             </div>
           )}
         </>

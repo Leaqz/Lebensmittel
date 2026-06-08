@@ -24,20 +24,21 @@ const TABS = [
 
 function EmptyHero({ mode }) {
   return (
-    <div className="card border-dashed border-2 border-emerald-200 p-12 flex flex-col items-center text-center">
-      <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-4 shadow-inner"
-        style={{ background: 'linear-gradient(135deg,#d1fae5,#a7f3d0)' }}>
-        <I.Cart size={28} color="#10b981" />
+    <div className="card p-12 flex flex-col items-center text-center" style={{ border: '1.5px dashed rgba(48,209,88,0.3)' }}>
+      <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-5"
+        style={{ background: 'linear-gradient(145deg,rgba(48,209,88,0.15),rgba(48,209,88,0.08))' }}>
+        <I.Cart size={26} color="#30D158" />
       </div>
-      <h3 className="font-extrabold text-gray-700 text-lg mb-2">Deine Liste ist leer</h3>
-      <p className="text-sm text-gray-400 max-w-xs leading-relaxed">
+      <h3 className="font-[800] text-[#1D1D1F] text-[17px] mb-2 tracking-[-0.02em]">Deine Liste ist leer</h3>
+      <p className="text-[14px] text-[#6E6E73] max-w-xs leading-relaxed">
         {mode === 'manual'
           ? 'Suche links nach Produkten und vergleiche die Preise bei Aldi, Lidl, REWE und EDEKA sofort.'
           : 'Nutze den KI-Planer links: Budget, Personenzahl und Ernährungsweise eingeben — fertig.'}
       </p>
-      <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs">
+      <div className="mt-6 flex flex-wrap justify-center gap-2 text-xs">
         {['🥛 Milchprodukte', '🍎 Obst', '🥩 Fleisch', '🍝 Nudeln', '🥬 Gemüse', '🧀 Käse', '☕ Getränke', '🧊 Tiefkühl'].map((c) => (
-          <span key={c} className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1.5 rounded-full font-semibold">
+          <span key={c} className="font-[600] px-3 py-1.5 rounded-full"
+            style={{ background:'rgba(48,209,88,0.08)', color:'#30D158' }}>
             {c}
           </span>
         ))}
@@ -94,65 +95,67 @@ function CrawlerPanel() {
     running: 'text-blue-600 bg-blue-50', skipped: 'text-gray-500 bg-gray-50',
   }[s] || 'text-gray-400');
 
+  const statusPill = (s) => ({
+    success: { bg: 'rgba(48,209,88,0.1)',  color: '#1A7A32', label: 'success'  },
+    failed:  { bg: 'rgba(255,59,48,0.1)',  color: '#C41E12', label: 'failed'   },
+    running: { bg: 'rgba(0,122,255,0.1)',  color: '#0055C7', label: 'running'  },
+    skipped: { bg: 'rgba(0,0,0,0.06)',     color: '#6E6E73', label: 'skipped'  },
+  }[s] || { bg: 'rgba(0,0,0,0.05)', color: '#AEAEB2', label: s });
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {toast && (
-        <div className="bg-gray-900 text-white text-sm font-semibold px-4 py-3 rounded-2xl shadow-xl">
+        <div className="anim-slideDown text-[13px] font-[600] px-4 py-3 rounded-[14px]"
+          style={{ background:'#1D1D1F', color:'#fff', boxShadow:'0 8px 32px rgba(0,0,0,0.3)' }}>
           {toast}
         </div>
       )}
 
       {loading ? (
-        <div className="card p-8 text-center text-gray-400 font-semibold">
+        <div className="card p-10 text-center text-[13px]" style={{ color:'#AEAEB2' }}>
           Verbinde mit Backend…
         </div>
       ) : (
         <>
-          {/* Config table */}
           <div className="card overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
-              <h2 className="font-bold text-gray-800 text-sm">Crawler-Konfiguration</h2>
+            <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom:'0.5px solid rgba(0,0,0,0.06)' }}>
+              <span className="text-[14px] font-[700]" style={{ color:'#1D1D1F' }}>Crawler-Konfiguration</span>
               <button
                 onClick={handleRun}
                 disabled={running}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
-                  running ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-md shadow-emerald-200'
+                className={`flex items-center gap-2 px-4 py-2 rounded-[980px] text-[12px] font-[700] transition-all ${
+                  running ? 'cursor-not-allowed' : ''
                 }`}
+                style={running
+                  ? { background:'#F2F2F7', color:'#AEAEB2' }
+                  : { background:'#007AFF', color:'#fff', boxShadow:'0 2px 12px rgba(0,122,255,0.35)' }
+                }
               >
-                {running ? <><I.Spinner size={12} color="#9ca3af" /> Läuft…</> : <><I.Zap size={12} /> Crawl starten</>}
+                {running ? <><I.Spinner size={12} color="#AEAEB2" /> Läuft…</> : <><I.Zap size={12} /> Crawl starten</>}
               </button>
             </div>
-
-            <div className="divide-y divide-gray-50">
+            <div>
               {configs.length === 0 && (
-                <div className="p-6 text-center text-sm text-gray-400">
-                  Keine Konfigurationen gefunden. Stelle sicher, dass das Backend läuft und die DB initialisiert ist.
+                <div className="p-6 text-center text-[13px]" style={{ color:'#AEAEB2' }}>
+                  Keine Konfigurationen — Backend starten &amp; DB initialisieren.
                 </div>
               )}
-              {configs.map((cfg) => (
-                <div key={cfg.id} className="px-5 py-3 flex items-center gap-4">
+              {configs.map((cfg, i) => (
+                <div key={cfg.id} className="px-5 py-3.5 flex items-center gap-4"
+                  style={i < configs.length - 1 ? { borderBottom:'0.5px solid rgba(0,0,0,0.05)' } : {}}>
                   <div className="flex-1">
-                    <div className="font-semibold text-gray-800 text-sm">{cfg.supermarket_name}</div>
-                    <div className="text-xs text-gray-400 mt-0.5">Max {cfg.max_items} Produkte · {cfg.delay_ms} ms Pause</div>
+                    <div className="text-[14px] font-[600]" style={{ color:'#1D1D1F' }}>{cfg.supermarket_name}</div>
+                    <div className="text-[12px] mt-0.5" style={{ color:'#AEAEB2' }}>Max {cfg.max_items} Produkte · {cfg.delay_ms} ms Pause</div>
                   </div>
-
-                  <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={cfg.is_enabled}
-                      onChange={(e) => handleToggle(cfg, 'is_enabled', e.target.checked)}
-                      className="rounded"
-                    />
+                  <label className="flex items-center gap-1.5 text-[12px] font-[600] cursor-pointer" style={{ color:'#6E6E73' }}>
+                    <input type="checkbox" checked={cfg.is_enabled}
+                      onChange={(e) => handleToggle(cfg, 'is_enabled', e.target.checked)} className="rounded" />
                     Aktiv
                   </label>
-
-                  <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 cursor-pointer" title="Nur einmal crawlen, danach überspringen. Deaktivieren zum erneuten Crawlen.">
-                    <input
-                      type="checkbox"
-                      checked={cfg.run_once}
-                      onChange={(e) => handleToggle(cfg, 'run_once', e.target.checked)}
-                      className="rounded"
-                    />
+                  <label className="flex items-center gap-1.5 text-[12px] font-[600] cursor-pointer" style={{ color:'#6E6E73' }}
+                    title="Nur einmal crawlen, danach überspringen.">
+                    <input type="checkbox" checked={cfg.run_once}
+                      onChange={(e) => handleToggle(cfg, 'run_once', e.target.checked)} className="rounded" />
                     Nur einmal
                   </label>
                 </div>
@@ -160,31 +163,38 @@ function CrawlerPanel() {
             </div>
           </div>
 
-          {/* History */}
           {history.length > 0 && (
             <div className="card overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-50">
-                <h2 className="font-bold text-gray-800 text-sm">Verlauf (letzte 20)</h2>
+              <div className="px-5 py-4" style={{ borderBottom:'0.5px solid rgba(0,0,0,0.06)' }}>
+                <span className="text-[14px] font-[700]" style={{ color:'#1D1D1F' }}>Verlauf (letzte 20)</span>
               </div>
-              <div className="divide-y divide-gray-50 max-h-72 overflow-y-auto">
-                {history.map((h) => (
-                  <div key={h.id} className="px-5 py-2.5 flex items-center gap-3 text-xs">
-                    <span className={`font-bold px-2 py-0.5 rounded-lg ${statusColor(h.status)}`}>{h.status}</span>
-                    <span className="font-semibold text-gray-700">{h.supermarket}</span>
-                    <span className="text-gray-400">{h.items_crawled} Produkte</span>
-                    <span className="text-gray-300 ml-auto">
-                      {new Date(h.started_at).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}
-                    </span>
-                  </div>
-                ))}
+              <div className="max-h-72 overflow-y-auto">
+                {history.map((h, i) => {
+                  const pill = statusPill(h.status);
+                  return (
+                    <div key={h.id} className="px-5 py-2.5 flex items-center gap-3 text-[12px]"
+                      style={i < history.length - 1 ? { borderBottom:'0.5px solid rgba(0,0,0,0.04)' } : {}}>
+                      <span className="font-[700] px-2 py-0.5 rounded-[6px]"
+                        style={{ background: pill.bg, color: pill.color }}>{h.status}</span>
+                      <span className="font-[600]" style={{ color:'#1D1D1F' }}>{h.supermarket}</span>
+                      <span style={{ color:'#6E6E73' }}>{h.items_crawled} Produkte</span>
+                      <span className="ml-auto" style={{ color:'#AEAEB2' }}>
+                        {new Date(h.started_at).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
 
-          {/* Info box */}
-          <div className="card p-4 text-xs text-gray-500 leading-relaxed bg-blue-50 border-blue-200">
-            <div className="font-bold text-blue-700 mb-1">💡 Wie funktioniert „Nur einmal"?</div>
-            <p>Wenn <strong>Nur einmal</strong> aktiviert ist, crawlt der Crawler diesen Markt nur beim ersten Durchlauf. Deaktiviere es, damit bei jedem Aufruf neu gecrawlt wird. Die Preise in der DB bleiben bis zum nächsten Crawl erhalten.</p>
+          <div className="card p-4 text-[12px] leading-relaxed"
+            style={{ background:'rgba(0,122,255,0.05)', boxShadow:'none', border:'0.5px solid rgba(0,122,255,0.15)' }}>
+            <div className="font-[700] mb-1" style={{ color:'#007AFF' }}>Wie funktioniert „Nur einmal"?</div>
+            <p style={{ color:'#6E6E73' }}>
+              Wenn <strong>Nur einmal</strong> aktiviert ist, crawlt der Crawler diesen Markt nur beim ersten Durchlauf.
+              Deaktiviere es, damit bei jedem Aufruf neu gecrawlt wird.
+            </p>
           </div>
         </>
       )}
@@ -345,16 +355,16 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg,#f0fdf4 0%,#fafffe 50%,#fffbeb 100%)' }}>
+    <div className="min-h-screen" style={{ background:'#F5F5F7' }}>
 
       {/* Toast */}
       {toast && (
-        <div className="fixed top-4 right-4 z-50 anim-slideDown bg-gray-900 text-white text-sm font-semibold px-4 py-3 rounded-2xl shadow-2xl max-w-xs">
+        <div className="fixed top-5 right-5 z-50 anim-slideDown text-[13px] font-[600] px-4 py-3 rounded-[14px] max-w-xs"
+          style={{ background:'#1D1D1F', color:'#fff', boxShadow:'0 8px 32px rgba(0,0,0,0.28)' }}>
           {toast}
         </div>
       )}
 
-      {/* Swap Modal */}
       {swapTarget && (
         <SwapModal
           item={list.find((i) => i.id === swapTarget)}
@@ -364,79 +374,77 @@ export default function App() {
         />
       )}
 
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-xl border-b border-emerald-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-md"
-              style={{ background: 'linear-gradient(135deg,#10b981,#059669)' }}>
-              <I.Cart size={20} color="white" />
+      {/* ── Header ── */}
+      <header className="sticky top-0 z-40" style={{
+        background: 'rgba(245,245,247,0.82)',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+        borderBottom: '0.5px solid rgba(0,0,0,0.08)',
+      }}>
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 h-[60px] flex items-center gap-4">
+
+          {/* Logo */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center"
+              style={{ background:'linear-gradient(145deg,#30D158,#1A9940)', boxShadow:'0 2px 8px rgba(48,209,88,0.4)' }}>
+              <I.Cart size={17} color="white" />
             </div>
-            <div>
-              <h1 className="font-extrabold text-gray-900 text-base leading-none tracking-tight">GroceryGenius</h1>
-              <p className="text-xs font-semibold text-emerald-500 mt-0.5">Schlau einkaufen — mehr sparen.</p>
-            </div>
+            <span className="font-[800] text-[16px] tracking-[-0.025em]" style={{ color:'#1D1D1F' }}>
+              GroceryGenius
+            </span>
           </div>
 
-          {/* Tab navigation */}
-          <nav className="hidden sm:flex items-center gap-1 bg-gray-100 rounded-2xl p-1">
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <span>{tab.icon}</span>
-                <span>{tab.label}</span>
-              </button>
-            ))}
+          {/* Segmented control — desktop */}
+          <nav className="hidden sm:flex flex-1 justify-center">
+            <div className="seg-control">
+              {TABS.map((tab) => (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                  className={`seg-tab ${activeTab === tab.id ? 'active' : ''}`}>
+                  <span>{tab.icon}</span>
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </div>
           </nav>
 
-          <div className="flex items-center gap-2">
+          {/* Right actions */}
+          <div className="flex items-center gap-2 ml-auto shrink-0">
             {(() => {
               const totalDeals = list.reduce((n, item) =>
                 n + allStores.filter((s) => s.distance <= radius && item.sales?.[s.catalogId || s.id]).length, 0);
               return totalDeals > 0 ? (
-                <div className="flex items-center gap-1.5 bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-full text-xs font-extrabold sale-glow">
-                  <I.Percent size={12} /> {totalDeals} Angebot{totalDeals > 1 ? 'e' : ''}
+                <div className="sale-glow flex items-center gap-1.5 px-3 py-1.5 rounded-[980px] text-[12px] font-[700]"
+                  style={{ background:'rgba(255,59,48,0.08)', color:'#FF3B30' }}>
+                  <I.Percent size={11} /> {totalDeals} Angebot{totalDeals > 1 ? 'e' : ''}
                 </div>
               ) : null;
             })()}
             {list.length > 0 && (
-              <button
-                onClick={() => setActiveTab('shop')}
-                className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-emerald-100 transition-colors"
-              >
-                <I.Cart size={13} /> {list.length}
+              <button onClick={() => setActiveTab('shop')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-[980px] text-[12px] font-[700] transition-all hover:opacity-80"
+                style={{ background:'rgba(48,209,88,0.1)', color:'#30D158' }}>
+                <I.Cart size={12} /> {list.length}
               </button>
             )}
           </div>
         </div>
 
-        {/* Mobile tab bar */}
-        <div className="sm:hidden flex border-t border-gray-100">
+        {/* Mobile bottom tab bar */}
+        <div className="sm:hidden flex" style={{ borderTop:'0.5px solid rgba(0,0,0,0.06)' }}>
           {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-xs font-bold transition-colors ${
-                activeTab === tab.id ? 'text-emerald-600 border-t-2 border-emerald-500' : 'text-gray-400'
-              }`}
-            >
-              <span className="text-base">{tab.icon}</span>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-[600] transition-colors"
+              style={{ color: activeTab === tab.id ? '#30D158' : '#AEAEB2' }}>
+              <span className="text-[18px] leading-none">{tab.icon}</span>
               <span>{tab.label}</span>
             </button>
           ))}
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      {/* ── Main content ── */}
+      <main className="max-w-7xl mx-auto px-5 sm:px-8 py-7">
 
-        {/* ── SHOP TAB ── */}
         {activeTab === 'shop' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             <div className="lg:col-span-4 space-y-4">
@@ -489,12 +497,11 @@ export default function App() {
           </div>
         )}
 
-        {/* ── MEALS TAB ── */}
         {activeTab === 'meals' && (
           <div>
-            <div className="mb-5">
-              <h2 className="font-extrabold text-gray-900 text-xl">Mahlzeiten planen</h2>
-              <p className="text-sm text-gray-500 mt-1">
+            <div className="mb-6">
+              <h2 className="font-[800] text-[26px] tracking-[-0.03em]" style={{ color:'#1D1D1F' }}>Mahlzeiten planen</h2>
+              <p className="text-[14px] mt-1.5" style={{ color:'#6E6E73' }}>
                 Wähle eine Mahlzeit, stelle die Portionen ein und füge die Zutaten direkt zur Einkaufsliste hinzu.
               </p>
             </div>
@@ -502,12 +509,11 @@ export default function App() {
           </div>
         )}
 
-        {/* ── CRAWLER TAB ── */}
         {activeTab === 'crawler' && (
           <div>
-            <div className="mb-5">
-              <h2 className="font-extrabold text-gray-900 text-xl">Crawler-Verwaltung</h2>
-              <p className="text-sm text-gray-500 mt-1">
+            <div className="mb-6">
+              <h2 className="font-[800] text-[26px] tracking-[-0.03em]" style={{ color:'#1D1D1F' }}>Crawler-Verwaltung</h2>
+              <p className="text-[14px] mt-1.5" style={{ color:'#6E6E73' }}>
                 Verwalte die Daten-Crawler für deutsche Supermärkte. Benötigt das laufende Backend (Docker).
               </p>
             </div>
