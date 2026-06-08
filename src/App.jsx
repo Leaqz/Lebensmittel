@@ -4,7 +4,7 @@ import { avgPrice, effectivePrice, bestEffectivePrice, fmt } from './utils/helpe
 import { CATALOG } from './data/catalog.js';
 import { STATIC_STORES, AI_PRESETS } from './data/constants.js';
 import { getUserLocation, fetchNearbyStores } from './services/location.js';
-import { fetchCrawlStatus, fetchCrawlConfigs, updateCrawlConfig, triggerCrawl } from './services/api.js';
+import { fetchCrawlStatus, fetchCrawlConfigs, updateCrawlConfig, triggerCrawl, fetchCrawledItems } from './services/api.js';
 import TravelPanel from './components/TravelPanel.jsx';
 import ListCreator from './components/ListCreator/index.jsx';
 import ListPanel from './components/ListPanel.jsx';
@@ -197,6 +197,36 @@ function CrawlerPanel() {
   );
 }
 
+// ── Transform backend API items into catalog format ───────────────────────────
+function _groupApiItems(apiItems) {
+  const byName = {};
+  for (const item of apiItems) {
+    const key = item.name.toLowerCase();
+    if (!byName[key]) {
+      byName[key] = {
+        id: `api_${key.replace(/[^a-z0-9]/g, '_')}`,
+        name: item.name,
+        brand: item.brand || '',
+        detail: item.detail || '',
+        category: `${item.category?.emoji || ''} ${item.category?.name || ''}`.trim(),
+        image_url: item.image_url || '',
+        prices: {},
+        salePrices: {},
+        sales: {},
+        alternatives: [],
+      };
+    }
+    const sid = item.supermarket?.catalog_id;
+    if (sid) {
+      const price = parseFloat(item.current_price);
+      byName[key].prices[sid] = price;
+      byName[key].sales[sid] = item.is_sale ? (item.sale_label || 'Angebot') : null;
+      byName[key].salePrices[sid] = item.is_sale ? price : null;
+    }
+  }
+  return Object.values(byName);
+}
+
 // ── Main App ───────────────────────────────────────────────────────────────────
 export default function App() {
   const [activeTab,     setActiveTab]     = useState('shop');
@@ -218,6 +248,7 @@ export default function App() {
   const [realStores,    setRealStores]    = useState(null);
 
   const searchRef = useRef(null);
+  const searchDebounce = useRef(null);
 
   const allStores = useMemo(() => realStores || STATIC_STORES, [realStores]);
 
@@ -226,16 +257,27 @@ export default function App() {
     [allStores, radius]
   );
 
-  const searchResults = useMemo(() =>
-    query.trim().length > 0
-      ? CATALOG.filter((p) =>
-          (p.name.toLowerCase().includes(query.toLowerCase()) ||
-           p.category.toLowerCase().includes(query.toLowerCase())) &&
-          !list.find((i) => i.id === p.id)
-        ).slice(0, 8)
-      : [],
-    [query, list]
-  );
+  const [searchResults, setSearchResults] = useState([]);
+
+  useEffect(() => {
+    if (!query.trim()) { setSearchResults([]); return; }
+    clearTimeout(searchDebounce.current);
+    searchDebounce.current = setTimeout(async () => {
+      try {
+        const data = await fetchCrawledItems({ search: query.trim(), page: 1 });
+        const grouped = _groupApiItems(data.items || []);
+        setSearchResults(grouped.filter((p) => !list.find((i) => i.id === p.id)).slice(0, 8));
+      } catch {
+        setSearchResults(
+          CATALOG.filter((p) =>
+            (p.name.toLowerCase().includes(query.toLowerCase()) ||
+             p.category.toLowerCase().includes(query.toLowerCase())) &&
+            !list.find((i) => i.id === p.id)
+          ).slice(0, 8)
+        );
+      }
+    }, 300);
+  }, [query, list]);
 
   const addItem = useCallback((item) => {
     setList((prev) => {

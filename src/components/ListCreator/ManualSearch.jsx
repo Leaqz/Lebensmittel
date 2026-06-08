@@ -1,6 +1,5 @@
 import { I } from '../../utils/icons.jsx';
 import { fmt } from '../../utils/helpers.js';
-import { CATALOG } from '../../data/catalog.js';
 
 export default function ManualSearch({ query, setQuery, dropOpen, setDropOpen, searchRef, searchResults, addItem }) {
   return (
@@ -89,7 +88,7 @@ export default function ManualSearch({ query, setQuery, dropOpen, setDropOpen, s
       )}
 
       <p className="text-[12px] mt-2 text-center" style={{ color: 'rgba(235,235,245,0.3)' }}>
-        {CATALOG.length} Produkte im Katalog
+        639+ Produkte aus dem Live-Katalog
       </p>
     </div>
   );
